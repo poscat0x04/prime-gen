@@ -100,6 +100,7 @@ void BN_set_negative(BIGNUM *a, bool neg);
 
 int BN_dec2bn(BIGNUM **bn, const char *str);
 char *BN_bn2dec(const BIGNUM *a);
+char *BN_bn2hex(const BIGNUM *a);
 
 // set dmax to point to the last non-zero digit
 void bn_correct_top(BIGNUM *a);
