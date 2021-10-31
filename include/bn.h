@@ -90,7 +90,6 @@ static inline BIGNUM *bn_expand(BIGNUM *a, int bits) {
 }
 
 void BN_free(BIGNUM *bn);
-void BN_init(BIGNUM *bn);
 BIGNUM *BN_new(void);
 BIGNUM *BN_dup(const BIGNUM *a);
 BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b);

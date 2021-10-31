@@ -38,11 +38,6 @@ void BN_free(BIGNUM *a) {
   free(a);
 }
 
-void BN_init(BIGNUM *a) {
-  static BIGNUM nilbn;
-  *a = nilbn;
-}
-
 BIGNUM *BN_new() {
   BIGNUM *ret;
   if ((ret = malloc(sizeof(*ret))) == NULL) {
