@@ -38,6 +38,12 @@ void BN_free(BIGNUM *a) {
   free(a);
 }
 
+void BN_free_alloca(BIGNUM *a) {
+  if (a == NULL)
+    return;
+  free(a->d);
+}
+
 BIGNUM *BN_new() {
   BIGNUM *ret;
   if ((ret = malloc(sizeof(*ret))) == NULL) {

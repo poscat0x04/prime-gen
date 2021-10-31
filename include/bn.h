@@ -63,6 +63,12 @@
     (r) = l & BN_MASK2;                                                        \
   }
 
+#define BN_alloca(val)                                                         \
+  {                                                                            \
+    val = alloca(sizeof(*val));                                                \
+    memset(val, 0, sizeof(*val));                                              \
+  }
+
 typedef uint64_t u64;
 typedef int64_t i64;
 typedef uint32_t u32;
@@ -91,6 +97,7 @@ static inline BIGNUM *bn_expand(BIGNUM *a, int bits) {
 }
 
 void BN_free(BIGNUM *bn);
+void BN_free_alloca(BIGNUM *bn);
 BIGNUM *BN_new(void);
 BIGNUM *BN_dup(const BIGNUM *a);
 BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b);
