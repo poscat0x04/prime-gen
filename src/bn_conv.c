@@ -1,6 +1,5 @@
 #include "bn.h"
 #include <ctype.h>
-#include <stdio.h>
 
 // lookup table
 const char Hex[] = "0123456789ABCDEF";

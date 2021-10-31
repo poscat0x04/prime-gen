@@ -10,6 +10,6 @@ int main(void) {
   BIGNUM **bn_ptr = &bn;
   int b = BN_dec2bn(bn_ptr, num);
   printf("%d\n", b);
-  printf("%s", BN_bn2dec(bn));
+  BN_print(bn);
   return 0;
 }

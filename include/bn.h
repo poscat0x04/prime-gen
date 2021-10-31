@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 // floor(log10(2^64))
 #define BN_DEC_NUM 19
@@ -101,6 +102,9 @@ void BN_set_negative(BIGNUM *a, bool neg);
 int BN_dec2bn(BIGNUM **bn, const char *str);
 char *BN_bn2dec(const BIGNUM *a);
 char *BN_bn2hex(const BIGNUM *a);
+
+bool BN_print_file(const BIGNUM *a, FILE *file);
+bool BN_print(const BIGNUM *a);
 
 // set dmax to point to the last non-zero digit
 void bn_correct_top(BIGNUM *a);
