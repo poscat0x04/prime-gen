@@ -48,6 +48,7 @@ BIGNUM *BN_new() {
   if ((ret = malloc(sizeof(*ret))) == NULL) {
     return NULL;
   }
+  memset(ret, 0, sizeof(*ret));
   return ret;
 }
 
@@ -68,9 +69,7 @@ BIGNUM *BN_dup(const BIGNUM *a) {
 }
 
 BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b) {
-  int bn_words;
-
-  bn_words = b->top;
+  int bn_words = b->top;
 
   if (a == b)
     return a;
@@ -101,6 +100,7 @@ void BN_set_negative(BIGNUM *a, bool neg) {
     a->neg = false;
   }
 }
+
 void bn_correct_top(BIGNUM *a) {
   u64 *ftl;
   int tmp_top = a->top;
@@ -118,7 +118,9 @@ void bn_correct_top(BIGNUM *a) {
 }
 
 bool bn_is_odd(const BIGNUM *a) { return (a->top > 0) & (a->d[0] & 1); }
+
 bool BN_is_zero(const BIGNUM *a) { return a->top == 0; }
+
 bool BN_is_negative(const BIGNUM *a) { return a->neg; }
 
 int BN_num_bits(const BIGNUM *a) {
