@@ -1,7 +1,6 @@
 #include "bn.h"
 #include <ctype.h>
 #include <stdio.h>
-#include <string.h>
 
 // lookup table
 const char Hex[] = "0123456789ABCDEF";
@@ -145,8 +144,12 @@ err:
 
 char *BN_bn2hex(const BIGNUM* a) {
   int v, z;
-  if (BN_is_zero(a))
-    return strdup("0");
+  if (BN_is_zero(a)) {
+    char *buf = malloc(1);
+    *buf = '0';
+    return buf;
+  }
+
   char *buf = malloc(a->top*BN_BYTES*2+2);
   if (buf == NULL) {
     goto err;
