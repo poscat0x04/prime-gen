@@ -99,6 +99,7 @@ static inline BIGINT *bn_expand(BIGINT *a, int bits) {
 
 void BN_free(BIGINT *bn);
 void BN_free_alloca(BIGINT *bn);
+void BN_free_allocas(int count, ...);
 BIGINT *BN_new(void);
 BIGINT *BN_dup(const BIGINT *a);
 BIGINT *BN_copy(BIGINT *a, const BIGINT *b);

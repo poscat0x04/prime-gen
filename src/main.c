@@ -14,5 +14,6 @@ int main(void) {
   BN_alloca(r)
   BN_mul(r, a, b);
   BN_print(r);
+  BN_free_allocas(3, r, a, b);
   return 0;
 }

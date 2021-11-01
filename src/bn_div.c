@@ -188,16 +188,12 @@ bool bn_div_fixed_top(BIGINT *dv,
   if (temp_res) {
     BN_free_alloca(res);
   }
-  BN_free_alloca(tmp);
-  BN_free_alloca(snum);
-  BN_free_alloca(sdiv);
+  BN_free_allocas(3, tmp, snum, sdiv);
   return true;
 err:
   if (temp_res) {
     BN_free_alloca(res);
   }
-  BN_free_alloca(tmp);
-  BN_free_alloca(snum);
-  BN_free_alloca(sdiv);
+  BN_free_allocas(3, tmp, snum, sdiv);
   return false;
 }

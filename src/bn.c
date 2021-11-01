@@ -1,6 +1,7 @@
 #include "bn.h"
 #include <assert.h>
 #include <string.h>
+#include <stdarg.h>
 
 u64 *bn_expand_internal(BIGINT *b, int words) {
   u64 *a = NULL;
@@ -51,6 +52,13 @@ void BN_free_alloca(BIGINT *a) {
   if (a == NULL)
     return;
   free(a->d);
+}
+
+void BN_free_allocas(int count,...) {
+  va_list ap;
+  va_start(ap, count);
+  for (int i = 0; i < count; i++)
+    BN_free_alloca(va_arg(ap, BIGINT *));
 }
 
 /// Allocates a bignum on the heap
