@@ -8,8 +8,10 @@ const int BN_BYTES = 8;
 const int BN_BITS2 = BN_BYTES * 8;
 const int BN_BITS4 = 32;
 
+#ifndef ASM
 const long BN_MASK2l = 0xffffffffL;
 const unsigned long long BN_MASK2h = 0xffffffff00000000LL;
+#endif
 
 const char *BN_DEC_FMT1 = "%lu";
 const char *BN_DEC_FMT2 = "%019lu";

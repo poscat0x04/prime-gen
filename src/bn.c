@@ -27,10 +27,17 @@ BIGINT *bn_expand2(BIGINT *b, int words) {
   return b;
 }
 
+/// Expands the max size of a bignum
+/// \param a The bignum to expand
+/// \param words The size of the bignum in words
+/// \return The reference to the expanded bignum, if successful,
+/// NULL otherwise
 BIGINT *bn_wexpand(BIGINT *a, int words) {
   return (words <= a->dmax) ? a : bn_expand2(a, words);
 }
 
+/// Frees a heap allocated bignum
+/// \param a The heap allocated bignum to free
 void BN_free(BIGINT *a) {
   if (a == NULL)
     return;
@@ -38,12 +45,17 @@ void BN_free(BIGINT *a) {
   free(a);
 }
 
+/// Frees a stack allocated bignum
+/// \param a The stack allocated bignum to free
 void BN_free_alloca(BIGINT *a) {
   if (a == NULL)
     return;
   free(a->d);
 }
 
+/// Allocates a bignum on the heap
+/// \return The reference to the allocated bignum, if successful,
+/// NULL otherwise
 BIGINT *BN_new() {
   BIGINT *ret;
   if ((ret = malloc(sizeof(*ret))) == NULL) {
@@ -53,6 +65,10 @@ BIGINT *BN_new() {
   return ret;
 }
 
+/// Duplicates a bigint
+/// \param a The bigint to duplicate
+/// \return The reference to the duplicated bigint, if successful,
+/// NULL otherwise
 BIGINT *BN_dup(const BIGINT *a) {
   BIGINT *t;
 
@@ -69,6 +85,11 @@ BIGINT *BN_dup(const BIGINT *a) {
   return t;
 }
 
+/// Copies a bignum to another bignum
+/// \param a The bigint to copy to
+/// \param b The bigint to copy from
+/// \return A reference to the bigint copied to, if successful,
+/// NULL otherwise
 BIGINT *BN_copy(BIGINT *a, const BIGINT *b) {
   int bn_words = b->top;
 
@@ -85,6 +106,10 @@ BIGINT *BN_copy(BIGINT *a, const BIGINT *b) {
   return a;
 }
 
+/// Sets the value of a bigint to a u64 integer
+/// \param a The bigint to set
+/// \param w The u64 integer
+/// \return Whether the operation is successful
 bool BN_set_word(BIGINT *a, u64 w) {
   if (bn_wexpand(a, 1) == NULL)
     return false;
@@ -94,6 +119,9 @@ bool BN_set_word(BIGINT *a, u64 w) {
   return true;
 }
 
+/// Sets the sign of a bigint
+/// \param a The bigint to modify
+/// \param neg Set to negative if true and positive if false
 void BN_set_negative(BIGINT *a, bool neg) {
   if (neg && !BN_is_zero(a)) {
     a->neg = true;
@@ -102,6 +130,8 @@ void BN_set_negative(BIGINT *a, bool neg) {
   }
 }
 
+/// Sets the dmax of a bigint to the highest significant digit
+/// \param a The bigint
 void bn_correct_top(BIGINT *a) {
   u64 *ftl;
   int tmp_top = a->top;
@@ -118,12 +148,26 @@ void bn_correct_top(BIGINT *a) {
     a->neg = false;
 }
 
+/// Checks if a bigint is odd
+/// \param a The bigint to check
+/// \return
 bool BN_is_odd(const BIGINT *a) { return (a->top > 0) & (a->d[0] & 1); }
 
+/// Checks if a bigint is zero
+/// \param a The bigint to check
+/// \return
 bool BN_is_zero(const BIGINT *a) { return a->top == 0; }
 
+
+/// Checks if a bigint is negative
+/// \param a The bigint to check
+/// \return
 bool BN_is_negative(const BIGINT *a) { return a->neg; }
 
+/// Compares the absolute values of two bigints
+/// \param a The first bigint
+/// \param b The second bigint
+/// \return positive if a > b, negative of a < b, zero if a = b
 int BN_ucmp(const BIGINT *a, const BIGINT *b) {
   u64 t1, t2, *ap, *bp;
   int i = a->top - b->top;
@@ -143,6 +187,9 @@ int BN_ucmp(const BIGINT *a, const BIGINT *b) {
   return 0;
 }
 
+/// Counts the number of bits a bigint uses
+/// \param a The bigint
+/// \return The number of bits the bigint uses
 int BN_num_bits(const BIGINT *a) {
   int i = a->top - 1;
   if (BN_is_zero(a))
@@ -150,10 +197,14 @@ int BN_num_bits(const BIGINT *a) {
   return ((i * BN_BITS2) + BN_num_bits_word(a->d[i]));
 }
 
+/// The number of bits a word(u64) uses
+/// \param l The word
+/// \return The number of bits the word uses
 int BN_num_bits_word(u64 l) {
   u64 x, mask;
   int bits = (l != 0);
 
+  // bisection
   x = l >> 32;
   mask = (0 - x) ;
   mask = (0 - (mask >> (BN_BITS2 - 1)));

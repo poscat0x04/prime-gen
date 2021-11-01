@@ -7,6 +7,8 @@
 typedef __uint128_t u128;
 typedef uint64_t u64;
 
+/// Multiplies two u64 numbers a, b and stores the higher bit of the result
+/// in high, the lower bit in low
 #define BN_UMULT_LOHI(low, high, a, b)                                         \
   {                                                                            \
     u128 ret_=(u128) (a) * (b);                                                \
@@ -44,6 +46,7 @@ typedef uint64_t u64;
   }
 
 
+/// Allocates a bigint on stack, intended to be used for temporary bigint variables
 #define BN_alloca(val)                                                         \
   {                                                                            \
     (val) = alloca(sizeof(*(val)));                                            \
@@ -59,15 +62,17 @@ extern const int BN_BYTES;
 extern const int BN_BITS2;
 extern const int BN_BITS4;
 
+#ifndef ASM
 extern const long BN_MASK2l;
 extern const unsigned long long BN_MASK2h;
+#endif
 
 extern const char *BN_DEC_FMT1;
 extern const char *BN_DEC_FMT2;
 
 struct bigint_t {
   u64 *d;   /* pointer to an array of u64 chunks */
-  int top;  /* highest significant bit */
+  int top;  /* highest significant digit */
   int dmax; /* size of the digits array */
   bool neg; /* whether if the number is negative */
 };
@@ -77,6 +82,11 @@ typedef struct bigint_t BIGINT;
 u64 *bn_expand_internal(BIGINT *b, int word);
 BIGINT *bn_expand2(BIGINT *b, int word);
 BIGINT *bn_wexpand(BIGINT *a, int word);
+/// Expands the max size of a bignum
+/// \param a The bignum to expand
+/// \param bits The size of the bignum, in bits
+/// \return The references to the expanded bignum, if successful,
+/// NULL otherwise
 static inline BIGINT *bn_expand(BIGINT *a, int bits) {
   if (bits > (INT_MAX - BN_BITS2 + 1))
     return NULL;
@@ -132,6 +142,7 @@ bool BN_is_zero(const BIGINT *a);
 bool BN_is_negative(const BIGINT *a);
 
 u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
+u64 bn_mul_add_words(u64 *rp, const u64 *ap, int num, u64 w);
 u64 bn_div_words(u64 h, u64 l, u64 d);
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n);
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b, int n);

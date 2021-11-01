@@ -1,5 +1,9 @@
 #include "bn.h"
 
+/// Prints a bignum to a file descriptor
+/// \param a The bignum to print
+/// \param file The file descriptor to print to
+/// \return Whether the operation is successful
 bool BN_print_file(const BIGINT *a, FILE *file) {
   char *str;
   if ((str = BN_bn2dec(a)) == NULL) {
@@ -11,6 +15,9 @@ bool BN_print_file(const BIGINT *a, FILE *file) {
   }
 }
 
+/// Prints a bignum to stdout
+/// \param a The bignum to print
+/// \return Whether the operation is successful
 bool BN_print(const BIGINT* a) {
   return BN_print_file(a, stdout);
 }

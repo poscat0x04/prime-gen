@@ -4,6 +4,11 @@
 // lookup table
 const char Hex[] = "0123456789ABCDEF";
 
+/// Parses a big decimal number into a bigint
+/// \param bn A pointer to a pointer to a bigint,
+/// the pointer that it points to can be a NULL pointer
+/// \param a The decimal number as a c string
+/// \return The number of characters read
 int BN_dec2bn(BIGINT **bn, const char *a) {
   BIGINT *ret = NULL;
   int neg = 0, i, j;
@@ -70,6 +75,9 @@ err:
   return 0;
 }
 
+/// Formats a bigint
+/// \param a The bigint to format
+/// \return A pointer to the formatted string, the caller is responsible of freeing the string
 char *BN_bn2dec(const BIGINT *a) {
   int num, ok = 0, n, tbytes;
   char *buf = NULL;

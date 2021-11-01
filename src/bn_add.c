@@ -1,5 +1,10 @@
 #include "bn.h"
 
+/// Signed add of a to b
+/// \param r The bigint to receive the result
+/// \param a The first bignum
+/// \param b The second bignum
+/// \return Whether the operation is successful
 bool BN_add(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
   int ret, r_neg, cmp_res;
@@ -26,7 +31,11 @@ bool BN_add(BIGINT *r, const BIGINT *a, const BIGINT *b)
   return ret;
 }
 
-/* signed sub of b from a. */
+/// Signed subtraction of b from a
+/// \param r The bigint to receive the result
+/// \param a The first bignum
+/// \param b The second bignum
+/// \return Whether the operation is successful
 bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
   bool ret, r_neg;
@@ -53,7 +62,11 @@ bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b)
   return ret;
 }
 
-/* unsigned add of b to a, r can be equal to a or b. */
+/// Unsigned add of b to a, r can be equal to a or b
+/// \param r The bigint to receive the result
+/// \param a The first bignum
+/// \param b The second bignum
+/// \return Whether the operation is successful
 bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
   const u64 *ap, *bp;
@@ -99,7 +112,11 @@ bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b)
   return 1;
 }
 
-/* unsigned subtraction of b from a, a must be larger than b. */
+/// Unsigned subtraction of b from a, a must be larger than b
+/// \param r The bignum ot receive the result
+/// \param a The first bignum
+/// \param b The second bignum
+/// \return Whether the operation is successful
 bool BN_usub(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
   int max, min, dif;
