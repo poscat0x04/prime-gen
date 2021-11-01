@@ -55,8 +55,7 @@ bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   return true;
 }
 
-bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n)
-{
+bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   int i, top, nw;
   unsigned int lb, rb;
   u64 *t, *f;

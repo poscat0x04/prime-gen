@@ -115,10 +115,16 @@ bool BN_sub_word(BIGINT *a, u64 w);
 bool BN_mul_word(BIGINT *a, u64 w);
 u64 BN_div_word(BIGINT *a, u64 w);
 
-bool BN_uadd(BIGINT *r, BIGINT *a, BIGINT *b);
-bool BN_add(BIGINT *r, BIGINT *a, BIGINT *b);
+int BN_ucmp(const BIGINT *a, const BIGINT *b);
+
+bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b);
+bool BN_add(BIGINT *r, const BIGINT *a, const BIGINT *b);
+bool BN_usub(BIGINT *r, const BIGINT *a, const BIGINT *b);
+bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b);
 bool BN_mul(BIGINT *r, BIGINT *a, BIGINT *b);
 bool BN_div(BIGINT *dv, BIGINT *rm, const BIGINT *num, const BIGINT *divisor);
+
+bool BN_mod(BIGINT *r, const BIGINT *m, const BIGINT *d);
 
 bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
 

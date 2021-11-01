@@ -124,6 +124,25 @@ bool BN_is_zero(const BIGINT *a) { return a->top == 0; }
 
 bool BN_is_negative(const BIGINT *a) { return a->neg; }
 
+int BN_ucmp(const BIGINT *a, const BIGINT *b) {
+  u64 t1, t2, *ap, *bp;
+  int i = a->top - b->top;
+  if (i != 0)
+    return i;
+  ap = a->d;
+  bp = b->d;
+  for (int j = a->top - 1; j >= 0; j--) {
+    t1 = ap[j];
+    t2 = bp[j];
+    if (t1 > t2) {
+      return 1;
+    } else if (t2 > t1) {
+      return -1;
+    }
+  }
+  return 0;
+}
+
 int BN_num_bits(const BIGINT *a) {
   int i = a->top - 1;
   if (BN_is_zero(a))
