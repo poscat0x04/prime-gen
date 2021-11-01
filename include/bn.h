@@ -4,53 +4,51 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define LBITS(a) ((a)&BN_MASK2l)
-#define HBITS(a) (((a) >> BN_BITS4) & BN_MASK2l)
-#define L2HBITS(a) (((a) << BN_BITS4) )
+typedef __uint128_t u128;
+typedef uint64_t u64;
 
-#define mul(r, a, bl, bh, c)                                                   \
+#define BN_UMULT_LOHI(low, high, a, b)                                         \
   {                                                                            \
-    u64 l, h;                                                                  \
-                                                                               \
-    h = (a);                                                                   \
-    l = LBITS(h);                                                              \
-    h = HBITS(h);                                                              \
-    {                                                                          \
-      u64 m, m1, lt, ht;                                                       \
-                                                                               \
-      lt = l;                                                                  \
-      ht = h;                                                                  \
-      m = (bh) * (lt);                                                         \
-      lt = (bl) * (lt);                                                        \
-      m1 = (bl) * (ht);                                                        \
-      ht = (bh) * (ht);                                                        \
-      m = (m + m1) ;                                                 \
-      if (m < m1)                                                              \
-        ht += L2HBITS((u64)1);                                                 \
-      ht += HBITS(m);                                                          \
-      m1 = L2HBITS(m);                                                         \
-      lt = (lt + m1) ;                                               \
-      if (lt < m1)                                                             \
-        ht++;                                                                  \
-      (l) = lt;                                                                \
-      (h) = ht;                                                                \
-    }                                                                          \
-    /* non-multiply part */                                                    \
-    l += (c);                                                                  \
-    if ((l ) < (c))                                                  \
-      h++;                                                                     \
-    (c) = h ;                                                        \
-    (r) = l ;                                                        \
+    u128 ret_=(u128) (a) * (b);                                                \
+    (high)=ret_>>64;                                                           \
+    (low)=ret_;                                                                \
   }
+
+#define mul_add(r, a, w, c)                                                    \
+  {                                                                            \
+    u64 high, low, ret, tmp=(a);                                               \
+    ret =  (r);                                                                \
+    BN_UMULT_LOHI(low, high, w, tmp);                                          \
+    ret += (c);                                                                \
+    (c) =  (ret < (c)) ? 1 : 0;                                                \
+    (c) += high;                                                               \
+    ret += low;                                                                \
+    (c) += (ret < low) ? 1 : 0;                                                \
+    (r) =  ret;                                                                \
+  }
+
+#define mul(r, a, w, c)                                                        \
+  {                                                                            \
+    u64 high, low, ret, ta = (a);                                              \
+    BN_UMULT_LOHI(low, high, w, ta);                                           \
+    ret =  low + (c);                                                          \
+    (c) =  high;                                                               \
+    (c) += (ret < low) ? 1 : 0;                                                \
+    (r) =  ret;                                                                \
+  }
+
+#define sqr(r0, r1, a)                                                         \
+  {                                                                            \
+    u64 tmp=(a);                                                               \
+    BN_UMULT_LOHI(r0,r1,tmp,tmp);                                              \
+  }
+
 
 #define BN_alloca(val)                                                         \
   {                                                                            \
-    val = alloca(sizeof(*val));                                                \
-    memset(val, 0, sizeof(*val));                                              \
+    (val) = alloca(sizeof(*(val)));                                            \
+    memset(val, 0, sizeof(*(val)));                                            \
   }
-
-typedef __uint128_t u128;
-typedef uint64_t u64;
 
 // floor(log10(2^64))
 extern const int BN_DEC_NUM;
@@ -136,7 +134,7 @@ bool BN_is_negative(const BIGINT *a);
 u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
 u64 bn_div_words(u64 h, u64 l, u64 d);
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n);
-u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,int n);
+u64 bn_add_words(u64 *r, const u64 *a, const u64 *b, int n);
 
 bool bn_div_fixed_top(BIGINT *dv,
                       BIGINT *rm,

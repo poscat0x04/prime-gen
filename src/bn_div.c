@@ -125,7 +125,7 @@ bool bn_div_fixed_top(BIGINT *dv,
     u64 q, l0;
     /*
      * the first part of the loop uses the top two words of snum and sdiv
-     * to calculate a BN_ULONG q such that | wnum - sdiv * q | < sdiv
+     * to calculate a u64 q such that | wnum - sdiv * q | < sdiv
      */
     u64 n0, n1, rem = 0;
 
@@ -137,6 +137,7 @@ bool bn_div_fixed_top(BIGINT *dv,
       u64 n2 = (wnumtop == wnum) ? 0 : wnumtop[-2];
       u64 t2l, t2h;
 
+      // divides n0:n1 by d0
       q = bn_div_words(n0, n1, d0);
 
       u128 ret = (u128) (d1) * (q);
@@ -160,13 +161,13 @@ bool bn_div_fixed_top(BIGINT *dv,
     tmp->d[div_n] = l0;
     wnum--;
     /*
-     * ignore top values of the bignums just sub the two BN_ULONG arrays
+     * ignore top values of the bignums just sub the two u64 arrays
      * with bn_sub_words
      */
     l0 = bn_sub_words(wnum, wnum, tmp->d, div_n + 1);
     q -= l0;
     /*
-     * Note: As we have considered only the leading two BN_ULONGs in
+     * Note: As we have considered only the leading two u64s in
      * the calculation of q, sdiv * q might be greater than wnum (but
      * then (q-1) * sdiv is less or equal than wnum)
      */

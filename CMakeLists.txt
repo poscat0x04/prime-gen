@@ -16,6 +16,11 @@ list(JOIN FLAGS " " FLAGS)
 set(CMAKE_C_FLAGS "${FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-g")
 set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
+option(USE_ASM "Use inline assembly" On)
+
+if (USE_ASM)
+    add_compile_definitions(ASM)
+endif()
 
 include_directories(include)
 add_subdirectory(src)

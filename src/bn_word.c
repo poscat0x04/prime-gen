@@ -92,33 +92,30 @@ bool BN_mul_word(BIGINT *a, u64 w) {
 }
 
 u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w) {
-  u64 carry = 0;
-  u64 bl, bh;
+  u64 c1 = 0;
 
-  assert(num >= 0);
   if (num <= 0)
-    return (u64)0;
-
-  bl = LBITS(w);
-  bh = HBITS(w);
+    return c1;
 
   while (num & ~3) {
-    mul(rp[0], ap[0], bl, bh, carry)
-    mul(rp[1], ap[1], bl, bh, carry)
-    mul(rp[2], ap[2], bl, bh, carry)
-    mul(rp[3], ap[3], bl, bh, carry)
+    mul(rp[0], ap[0], w, c1)
+    mul(rp[1], ap[1], w, c1)
+    mul(rp[2], ap[2], w, c1)
+    mul(rp[3], ap[3], w, c1)
     ap += 4;
     rp += 4;
     num -= 4;
   }
-
-  while (num) {
-    mul(rp[0], ap[0], bl, bh, carry)
-    ap++;
-    rp++;
-    num--;
+  if (num) {
+    mul(rp[0], ap[0], w, c1)
+    if (--num == 0)
+      return c1;
+    mul(rp[1], ap[1], w, c1)
+    if (--num == 0)
+      return c1;
+    mul(rp[2], ap[2], w, c1)
   }
-  return carry;
+  return c1;
 }
 
 u64 BN_div_word(BIGINT *a, u64 w) {
@@ -153,6 +150,17 @@ u64 BN_div_word(BIGINT *a, u64 w) {
   return ret;
 }
 
+#ifdef ASM
+u64 bn_div_words(u64 h, u64 l, u64 d) {
+  u64 ret, waste;
+  asm( "divq      %4"
+     : "=a"(ret), "=d"(waste)
+     : "a"(l), "d"(h), "r"(d)
+     : "cc");
+
+  return ret;
+}
+#else
 u64 bn_div_words(u64 h, u64 l, u64 d) {
   u64 dh, dl, q, ret = 0, th, tl, t;
   int i, count = 2;
@@ -214,6 +222,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   ret |= q;
   return ret;
 }
+#endif
 
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   u64 t1, t2;
@@ -236,15 +245,12 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   return carry;
 }
 
-u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,
-                      int n) {
+u64 bn_add_words(u64 *r, const u64 *a, const u64 *b, int n) {
   u64 carry = 0, l, t;
 
   assert(n >= 0);
   if (n <= 0)
     return (u64)0;
-
-  carry = 0;
 
   while (n) {
     t = a[0];
