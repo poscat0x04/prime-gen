@@ -271,44 +271,13 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
 
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,
                       int n) {
-  u64 c, l, t;
+  u64 c = 0, l, t;
 
   assert(n >= 0);
   if (n <= 0)
     return (u64)0;
 
   c = 0;
-
-  while (n & ~3) {
-    t = a[0];
-    t = (t + c) & BN_MASK2;
-    c = (t < c);
-    l = (t + b[0]) & BN_MASK2;
-    c += (l < t);
-    r[0] = l;
-    t = a[1];
-    t = (t + c) & BN_MASK2;
-    c = (t < c);
-    l = (t + b[1]) & BN_MASK2;
-    c += (l < t);
-    r[1] = l;
-    t = a[2];
-    t = (t + c) & BN_MASK2;
-    c = (t < c);
-    l = (t + b[2]) & BN_MASK2;
-    c += (l < t);
-    r[2] = l;
-    t = a[3];
-    t = (t + c) & BN_MASK2;
-    c = (t < c);
-    l = (t + b[3]) & BN_MASK2;
-    c += (l < t);
-    r[3] = l;
-    a += 4;
-    b += 4;
-    r += 4;
-    n -= 4;
-  }
 
   while (n) {
     t = a[0];

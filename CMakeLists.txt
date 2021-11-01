@@ -15,7 +15,7 @@ list(APPEND FLAGS "-Werror=implicit-function-declaration")
 list(JOIN FLAGS " " FLAGS)
 set(CMAKE_C_FLAGS "${FLAGS}")
 set(CMAKE_C_FLAGS_DEBUG "-g")
-set(CMAKE_C_FLAGS_RELEASE "-O3")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native")
 
 include_directories(include)
 add_subdirectory(src)

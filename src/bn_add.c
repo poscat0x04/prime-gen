@@ -29,17 +29,17 @@ bool BN_add(BIGINT *r, const BIGINT *a, const BIGINT *b)
 /* signed sub of b from a. */
 bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
-  int ret, r_neg, cmp_res;
+  bool ret, r_neg;
 
   if (a->neg != b->neg) {
     r_neg = a->neg;
     ret = BN_uadd(r, a, b);
   } else {
-    cmp_res = BN_ucmp(a, b);
-    if (cmp_res > 0) {
+    int cmp = BN_ucmp(a, b);
+    if (cmp > 0) {
       r_neg = a->neg;
       ret = BN_usub(r, a, b);
-    } else if (cmp_res < 0) {
+    } else if (cmp < 0) {
       r_neg = !b->neg;
       ret = BN_usub(r, b, a);
     } else {
@@ -56,10 +56,10 @@ bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b)
 /* unsigned add of b to a, r can be equal to a or b. */
 bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b)
 {
-  int max, min, dif;
   const u64 *ap, *bp;
   u64 *rp, carry, t1, t2;
 
+  // ensure a > b
   if (a->top < b->top) {
     const BIGINT *tmp;
 
@@ -67,9 +67,10 @@ bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b)
     a = b;
     b = tmp;
   }
-  max = a->top;
-  min = b->top;
-  dif = max - min;
+
+  int max = a->top;
+  int min = b->top;
+  int dif = max - min;
 
   if (bn_wexpand(r, max + 1) == NULL)
     return 0;
