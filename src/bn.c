@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 
-u64 *bn_expand_internal(BIGNUM *b, int words) {
+u64 *bn_expand_internal(BIGINT *b, int words) {
   u64 *a = NULL;
   if (words > (INT_MAX / (4 * BN_BITS2))) {
     return NULL;
@@ -14,7 +14,7 @@ u64 *bn_expand_internal(BIGNUM *b, int words) {
   return a;
 }
 
-BIGNUM *bn_expand2(BIGNUM *b, int words) {
+BIGINT *bn_expand2(BIGINT *b, int words) {
   if (words > b->dmax) {
     u64 *a = bn_expand_internal(b, words);
     if (!a)
@@ -27,25 +27,25 @@ BIGNUM *bn_expand2(BIGNUM *b, int words) {
   return b;
 }
 
-BIGNUM *bn_wexpand(BIGNUM *a, int words) {
+BIGINT *bn_wexpand(BIGINT *a, int words) {
   return (words <= a->dmax) ? a : bn_expand2(a, words);
 }
 
-void BN_free(BIGNUM *a) {
+void BN_free(BIGINT *a) {
   if (a == NULL)
     return;
   free(a->d);
   free(a);
 }
 
-void BN_free_alloca(BIGNUM *a) {
+void BN_free_alloca(BIGINT *a) {
   if (a == NULL)
     return;
   free(a->d);
 }
 
-BIGNUM *BN_new() {
-  BIGNUM *ret;
+BIGINT *BN_new() {
+  BIGINT *ret;
   if ((ret = malloc(sizeof(*ret))) == NULL) {
     return NULL;
   }
@@ -53,8 +53,8 @@ BIGNUM *BN_new() {
   return ret;
 }
 
-BIGNUM *BN_dup(const BIGNUM *a) {
-  BIGNUM *t;
+BIGINT *BN_dup(const BIGINT *a) {
+  BIGINT *t;
 
   if (a == NULL)
     return NULL;
@@ -69,7 +69,7 @@ BIGNUM *BN_dup(const BIGNUM *a) {
   return t;
 }
 
-BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b) {
+BIGINT *BN_copy(BIGINT *a, const BIGINT *b) {
   int bn_words = b->top;
 
   if (a == b)
@@ -85,7 +85,7 @@ BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b) {
   return a;
 }
 
-bool BN_set_word(BIGNUM *a, u64 w) {
+bool BN_set_word(BIGINT *a, u64 w) {
   if (bn_wexpand(a, 1) == NULL)
     return false;
   a->neg = false;
@@ -94,7 +94,7 @@ bool BN_set_word(BIGNUM *a, u64 w) {
   return true;
 }
 
-void BN_set_negative(BIGNUM *a, bool neg) {
+void BN_set_negative(BIGINT *a, bool neg) {
   if (neg && !BN_is_zero(a)) {
     a->neg = true;
   } else {
@@ -102,7 +102,7 @@ void BN_set_negative(BIGNUM *a, bool neg) {
   }
 }
 
-void bn_correct_top(BIGNUM *a) {
+void bn_correct_top(BIGINT *a) {
   u64 *ftl;
   int tmp_top = a->top;
 
@@ -118,13 +118,13 @@ void bn_correct_top(BIGNUM *a) {
     a->neg = false;
 }
 
-bool BN_is_odd(const BIGNUM *a) { return (a->top > 0) & (a->d[0] & 1); }
+bool BN_is_odd(const BIGINT *a) { return (a->top > 0) & (a->d[0] & 1); }
 
-bool BN_is_zero(const BIGNUM *a) { return a->top == 0; }
+bool BN_is_zero(const BIGINT *a) { return a->top == 0; }
 
-bool BN_is_negative(const BIGNUM *a) { return a->neg; }
+bool BN_is_negative(const BIGINT *a) { return a->neg; }
 
-int BN_num_bits(const BIGNUM *a) {
+int BN_num_bits(const BIGINT *a) {
   int i = a->top - 1;
   if (BN_is_zero(a))
     return 0;

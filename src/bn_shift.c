@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <string.h>
 
-bool BN_lshift(BIGNUM *r, const BIGNUM *a, int n) {
+bool BN_lshift(BIGINT *r, const BIGINT *a, int n) {
   int ret;
 
   if (n < 0) {
@@ -14,7 +14,7 @@ bool BN_lshift(BIGNUM *r, const BIGNUM *a, int n) {
   return ret;
 }
 
-bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n) {
+bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   int i, nw;
   unsigned int lb, rb;
   u64 *t, *f;
@@ -55,7 +55,7 @@ bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n) {
   return true;
 }
 
-bool bn_rshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n)
+bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n)
 {
   int i, top, nw;
   unsigned int lb, rb;

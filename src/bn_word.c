@@ -2,7 +2,7 @@
 #include <assert.h>
 #include <stdlib.h>
 
-bool BN_add_word(BIGNUM *a, u64 w) {
+bool BN_add_word(BIGINT *a, u64 w) {
   u64 l;
   int i;
 
@@ -34,7 +34,7 @@ bool BN_add_word(BIGNUM *a, u64 w) {
   return true;
 }
 
-bool BN_sub_word(BIGNUM *a, u64 w) {
+bool BN_sub_word(BIGINT *a, u64 w) {
   int i;
 
   w &= BN_MASK2;
@@ -62,7 +62,7 @@ bool BN_sub_word(BIGNUM *a, u64 w) {
     return true;
   }
   i = 0;
-  for (;;) {
+  while (true) {
     if (a->d[i] >= w) {
       a->d[i] -= w;
       break;
@@ -77,7 +77,7 @@ bool BN_sub_word(BIGNUM *a, u64 w) {
   return true;
 }
 
-bool BN_mul_word(BIGNUM *a, u64 w) {
+bool BN_mul_word(BIGINT *a, u64 w) {
   u64 ll;
 
   w &= BN_MASK2;
@@ -126,7 +126,7 @@ u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w) {
   return carry;
 }
 
-u64 BN_div_word(BIGNUM *a, u64 w) {
+u64 BN_div_word(BIGINT *a, u64 w) {
   u64 ret = 0;
   int i, j;
 
@@ -181,7 +181,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   }
   dh = (d & BN_MASK2h) >> BN_BITS4;
   dl = (d & BN_MASK2l);
-  for (;;) {
+  while (true) {
     if ((h >> BN_BITS4) == dh)
       q = BN_MASK2l;
     else
@@ -189,7 +189,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
 
     th = q * dh;
     tl = dl * q;
-    for (;;) {
+    while (true) {
       t = h - th;
       if ((t & BN_MASK2h) ||
           ((tl) <= ((t << BN_BITS4) | ((l & BN_MASK2h) >> BN_BITS4))))
@@ -229,7 +229,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   if (n <= 0)
     return (u64)0;
 
-  for (;;) {
+  while (true) {
     t1 = a[0];
     t2 = b[0];
     r[0] = (t1 - t2 - c) & BN_MASK2;

@@ -1,6 +1,6 @@
 #include "bn.h"
 
-bool BN_print_file(const BIGNUM *a, FILE *file) {
+bool BN_print_file(const BIGINT *a, FILE *file) {
   char *str;
   if ((str = BN_bn2dec(a)) == NULL) {
     return false;
@@ -11,6 +11,6 @@ bool BN_print_file(const BIGNUM *a, FILE *file) {
   }
 }
 
-bool BN_print(const BIGNUM* a) {
+bool BN_print(const BIGINT* a) {
   return BN_print_file(a, stdout);
 }

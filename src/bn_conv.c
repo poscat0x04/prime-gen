@@ -4,8 +4,8 @@
 // lookup table
 const char Hex[] = "0123456789ABCDEF";
 
-int BN_dec2bn(BIGNUM **bn, const char *a) {
-  BIGNUM *ret = NULL;
+int BN_dec2bn(BIGINT **bn, const char *a) {
+  BIGINT *ret = NULL;
   int neg = 0, i, j;
   int num;
 
@@ -70,11 +70,11 @@ err:
   return 0;
 }
 
-char *BN_bn2dec(const BIGNUM *a) {
+char *BN_bn2dec(const BIGINT *a) {
   int num, ok = 0, n, tbytes;
   char *buf = NULL;
   char *p;
-  BIGNUM *t = NULL;
+  BIGINT *t = NULL;
   u64 *bn_data = NULL, *lp;
   int bn_data_num;
   /*-
@@ -140,7 +140,7 @@ err:
   return NULL;
 }
 
-char *BN_bn2hex(const BIGNUM* a) {
+char *BN_bn2hex(const BIGINT* a) {
   int v, z;
   if (BN_is_zero(a)) {
     char *buf = malloc(1);

@@ -3,7 +3,7 @@
 #include <alloca.h>
 #include <string.h>
 
-static int bn_left_align(BIGNUM *num) {
+static int bn_left_align(BIGINT *num) {
   u64 *d = num->d, n, m, rmask;
   int top = num->top;
   int rshift = BN_num_bits_word(d[top-1]), lshift, i;
@@ -22,7 +22,7 @@ static int bn_left_align(BIGNUM *num) {
   return lshift;
 }
 
-bool BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor) {
+bool BN_div(BIGINT *dv, BIGINT *rm, const BIGINT *num, const BIGINT *divisor) {
   bool ret;
 
   if (BN_is_zero(divisor)) {
@@ -50,12 +50,12 @@ bool BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor) {
   return ret;
 }
 
-bool bn_div_fixed_top(BIGNUM *dv,
-                      BIGNUM *rm,
-                     const BIGNUM *num,
-                     const BIGNUM *divisor) {
+bool bn_div_fixed_top(BIGINT *dv,
+                      BIGINT *rm,
+                      const BIGINT *num,
+                      const BIGINT *divisor) {
   int norm_shift, i, j, loop;
-  BIGNUM *tmp, *snum, *sdiv, *res;
+  BIGINT *tmp, *snum, *sdiv, *res;
   u64 *resp, *wnum, *wnumtop;
   u64 d0, d1;
   int num_n, div_n, num_neg;
@@ -143,7 +143,7 @@ bool bn_div_fixed_top(BIGNUM *dv,
       t2h = ret >> 64;
       t2l = ret;
 
-      for (;;) {
+      while (true) {
         if ((t2h < rem) || ((t2h == rem) && (t2l <= n2)))
           break;
         q--;

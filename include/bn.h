@@ -4,47 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// floor(log10(2^64))
-#define BN_DEC_NUM 19
-// 10^BN_DEC_NUM
-#define BN_DEC_CONV (UINT64_C(10000000000000000000))
-
-#define BN_BYTES 8
-#define BN_BITS2 (BN_BYTES * 8)
-#define BN_BITS4 32
-
-#define BN_MASK2 (0xffffffffffffffffLL)
-#define BN_MASK2l (0xffffffffL)
-#define BN_MASK2h (0xffffffff00000000LL)
-
 #define LBITS(a) ((a)&BN_MASK2l)
 #define HBITS(a) (((a) >> BN_BITS4) & BN_MASK2l)
 #define L2HBITS(a) (((a) << BN_BITS4) & BN_MASK2)
-
-#define BN_DEC_FMT1 "%lu"
-#define BN_DEC_FMT2 "%019lu"
-
-#define mul64(l, h, bl, bh)                                                    \
-  {                                                                            \
-    u64 m, m1, lt, ht;                                                         \
-                                                                               \
-    lt = l;                                                                    \
-    ht = h;                                                                    \
-    m = (bh) * (lt);                                                           \
-    lt = (bl) * (lt);                                                          \
-    m1 = (bl) * (ht);                                                          \
-    ht = (bh) * (ht);                                                          \
-    m = (m + m1) & BN_MASK2;                                                   \
-    if (m < m1)                                                                \
-      ht += L2HBITS((u64)1);                                                   \
-    ht += HBITS(m);                                                            \
-    m1 = L2HBITS(m);                                                           \
-    lt = (lt + m1) & BN_MASK2;                                                 \
-    if (lt < m1)                                                               \
-      ht++;                                                                    \
-    (l) = lt;                                                                  \
-    (h) = ht;                                                                  \
-  }
 
 #define mul(r, a, bl, bh, c)                                                   \
   {                                                                            \
@@ -53,8 +15,26 @@
     h = (a);                                                                   \
     l = LBITS(h);                                                              \
     h = HBITS(h);                                                              \
-    mul64(l, h, (bl), (bh));                                                   \
+    {                                                                          \
+      u64 m, m1, lt, ht;                                                       \
                                                                                \
+      lt = l;                                                                  \
+      ht = h;                                                                  \
+      m = (bh) * (lt);                                                         \
+      lt = (bl) * (lt);                                                        \
+      m1 = (bl) * (ht);                                                        \
+      ht = (bh) * (ht);                                                        \
+      m = (m + m1) & BN_MASK2;                                                 \
+      if (m < m1)                                                              \
+        ht += L2HBITS((u64)1);                                                 \
+      ht += HBITS(m);                                                          \
+      m1 = L2HBITS(m);                                                         \
+      lt = (lt + m1) & BN_MASK2;                                               \
+      if (lt < m1)                                                             \
+        ht++;                                                                  \
+      (l) = lt;                                                                \
+      (h) = ht;                                                                \
+    }                                                                          \
     /* non-multiply part */                                                    \
     l += (c);                                                                  \
     if ((l & BN_MASK2) < (c))                                                  \
@@ -70,25 +50,37 @@
   }
 
 typedef __uint128_t u128;
-typedef __int128_t i128;
 typedef uint64_t u64;
-typedef int64_t i64;
-typedef uint32_t u32;
-typedef int32_t i32;
 
-struct bignum_st {
+// floor(log10(2^64))
+extern const int BN_DEC_NUM;
+// 10^BN_DEC_NUM
+extern const u64 BN_DEC_CONV;
+
+extern const int BN_BYTES;
+extern const int BN_BITS2;
+extern const int BN_BITS4;
+
+extern const unsigned long long BN_MASK2;
+extern const long BN_MASK2l;
+extern const unsigned long long BN_MASK2h;
+
+extern const char *BN_DEC_FMT1;
+extern const char *BN_DEC_FMT2;
+
+struct bigint_t {
   u64 *d;   /* pointer to an array of u64 chunks */
-  int top;  /* index of last used d +1 */
-  int dmax; /* size of the d array */
+  int top;  /* highest significant bit */
+  int dmax; /* size of the digits array */
   bool neg; /* whether if the number is negative */
 };
 
-typedef struct bignum_st BIGNUM;
+typedef struct bigint_t BIGINT;
 
-u64 *bn_expand_internal(BIGNUM *b, int word);
-BIGNUM *bn_expand2(BIGNUM *b, int word);
-BIGNUM *bn_wexpand(BIGNUM *a, int word);
-static inline BIGNUM *bn_expand(BIGNUM *a, int bits) {
+u64 *bn_expand_internal(BIGINT *b, int word);
+BIGINT *bn_expand2(BIGINT *b, int word);
+BIGINT *bn_wexpand(BIGINT *a, int word);
+static inline BIGINT *bn_expand(BIGINT *a, int bits) {
   if (bits > (INT_MAX - BN_BITS2 + 1))
     return NULL;
 
@@ -98,53 +90,53 @@ static inline BIGNUM *bn_expand(BIGNUM *a, int bits) {
   return bn_expand2((a), (bits + BN_BITS2 - 1) / BN_BITS2);
 }
 
-void BN_free(BIGNUM *bn);
-void BN_free_alloca(BIGNUM *bn);
-BIGNUM *BN_new(void);
-BIGNUM *BN_dup(const BIGNUM *a);
-BIGNUM *BN_copy(BIGNUM *a, const BIGNUM *b);
+void BN_free(BIGINT *bn);
+void BN_free_alloca(BIGINT *bn);
+BIGINT *BN_new(void);
+BIGINT *BN_dup(const BIGINT *a);
+BIGINT *BN_copy(BIGINT *a, const BIGINT *b);
 
-bool BN_set_word(BIGNUM *a, u64 w);
+bool BN_set_word(BIGINT *a, u64 w);
 #define BN_zero(a) (BN_set_word((a), 0))
-void BN_set_negative(BIGNUM *a, bool neg);
+void BN_set_negative(BIGINT *a, bool neg);
 
-int BN_dec2bn(BIGNUM **bn, const char *str);
-char *BN_bn2dec(const BIGNUM *a);
-char *BN_bn2hex(const BIGNUM *a);
+int BN_dec2bn(BIGINT **bn, const char *str);
+char *BN_bn2dec(const BIGINT *a);
+char *BN_bn2hex(const BIGINT *a);
 
-bool BN_print_file(const BIGNUM *a, FILE *file);
-bool BN_print(const BIGNUM *a);
+bool BN_print_file(const BIGINT *a, FILE *file);
+bool BN_print(const BIGINT *a);
 
 // set dmax to point to the last non-zero digit
-void bn_correct_top(BIGNUM *a);
+void bn_correct_top(BIGINT *a);
 
-bool BN_add_word(BIGNUM *a, u64 w);
-bool BN_sub_word(BIGNUM *a, u64 w);
-bool BN_mul_word(BIGNUM *a, u64 w);
-u64 BN_div_word(BIGNUM *a, u64 w);
+bool BN_add_word(BIGINT *a, u64 w);
+bool BN_sub_word(BIGINT *a, u64 w);
+bool BN_mul_word(BIGINT *a, u64 w);
+u64 BN_div_word(BIGINT *a, u64 w);
 
-bool BN_uadd(BIGNUM *r, BIGNUM *a, BIGNUM *b);
-bool BN_add(BIGNUM *r, BIGNUM *a, BIGNUM *b);
-bool BN_mul(BIGNUM *r, BIGNUM *a, BIGNUM *b);
-bool BN_div(BIGNUM *dv, BIGNUM *rm, const BIGNUM *num, const BIGNUM *divisor);
+bool BN_uadd(BIGINT *r, BIGINT *a, BIGINT *b);
+bool BN_add(BIGINT *r, BIGINT *a, BIGINT *b);
+bool BN_mul(BIGINT *r, BIGINT *a, BIGINT *b);
+bool BN_div(BIGINT *dv, BIGINT *rm, const BIGINT *num, const BIGINT *divisor);
 
-bool BN_lshift(BIGNUM *r, const BIGNUM *a, int n);
+bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
 
-int BN_num_bits(const BIGNUM *a);
+int BN_num_bits(const BIGINT *a);
 int BN_num_bits_word(u64 w);
 
-bool BN_is_zero(const BIGNUM *a);
-bool BN_is_negative(const BIGNUM *a);
+bool BN_is_zero(const BIGINT *a);
+bool BN_is_negative(const BIGINT *a);
 
 u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
 u64 bn_div_words(u64 h, u64 l, u64 d);
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n);
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,int n);
 
-bool bn_div_fixed_top(BIGNUM *dv,
-                      BIGNUM *rm,
-                      const BIGNUM *num,
-                      const BIGNUM *divisor);
-bool BN_is_odd(const BIGNUM *a);
-bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n);
-bool bn_rshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n);
+bool bn_div_fixed_top(BIGINT *dv,
+                      BIGINT *rm,
+                      const BIGINT *num,
+                      const BIGINT *divisor);
+bool BN_is_odd(const BIGINT *a);
+bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n);
+bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n);
