@@ -19,6 +19,10 @@ int main(void) {
   BN_dec2bn(&divisor, "10");
   BN_div(NULL, rm, bn, divisor);
   BN_print(rm);
+  putchar('\n');
+  BN_zero(rm);
+  BN_sub(rm, bn, bn);
+  BN_print(rm);
   BN_free_alloca(bn);
   return 0;
 }

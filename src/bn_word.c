@@ -217,72 +217,46 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
 
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   u64 t1, t2;
-  int c = 0;
+  int carry = 0;
 
   if (n <= 0)
     return (u64)0;
 
-  while (true) {
+  while (n) {
     t1 = a[0];
     t2 = b[0];
-    r[0] = (t1 - t2 - c) ;
+    r[0] = t1 - t2 - carry;
     if (t1 != t2)
-      c = (t1 < t2);
-    if (--n <= 0)
-      break;
-
-    t1 = a[1];
-    t2 = b[1];
-    r[1] = (t1 - t2 - c) ;
-    if (t1 != t2)
-      c = (t1 < t2);
-    if (--n <= 0)
-      break;
-
-    t1 = a[2];
-    t2 = b[2];
-    r[2] = (t1 - t2 - c) ;
-    if (t1 != t2)
-      c = (t1 < t2);
-    if (--n <= 0)
-      break;
-
-    t1 = a[3];
-    t2 = b[3];
-    r[3] = (t1 - t2 - c) ;
-    if (t1 != t2)
-      c = (t1 < t2);
-    if (--n <= 0)
-      break;
-
-    a += 4;
-    b += 4;
-    r += 4;
+      carry = (t1 < t2);
+    a++;
+    b++;
+    r++;
+    n--;
   }
-  return c;
+  return carry;
 }
 
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,
                       int n) {
-  u64 c = 0, l, t;
+  u64 carry = 0, l, t;
 
   assert(n >= 0);
   if (n <= 0)
     return (u64)0;
 
-  c = 0;
+  carry = 0;
 
   while (n) {
     t = a[0];
-    t = (t + c) ;
-    c = (t < c);
+    t = (t + carry) ;
+    carry = (t < carry);
     l = (t + b[0]) ;
-    c += (l < t);
+    carry += (l < t);
     r[0] = l;
     a++;
     b++;
     r++;
     n--;
   }
-  return (u64)c;
+  return (u64)carry;
 }
