@@ -108,17 +108,17 @@ u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w) {
   bh = HBITS(w);
 
   while (num & ~3) {
-    mul(rp[0], ap[0], bl, bh, carry);
-    mul(rp[1], ap[1], bl, bh, carry);
-    mul(rp[2], ap[2], bl, bh, carry);
-    mul(rp[3], ap[3], bl, bh, carry);
+    mul(rp[0], ap[0], bl, bh, carry)
+    mul(rp[1], ap[1], bl, bh, carry)
+    mul(rp[2], ap[2], bl, bh, carry)
+    mul(rp[3], ap[3], bl, bh, carry)
     ap += 4;
     rp += 4;
     num -= 4;
   }
 
   while (num) {
-    mul(rp[0], ap[0], bl, bh, carry);
+    mul(rp[0], ap[0], bl, bh, carry)
     ap++;
     rp++;
     num--;
@@ -222,7 +222,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   return ret;
 }
 
-u64 bn_sub_words(u64 *r, u64 *a, u64 *b, int n) {
+u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   u64 t1, t2;
   int c = 0;
 

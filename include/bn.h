@@ -138,13 +138,13 @@ bool BN_is_negative(const BIGNUM *a);
 
 u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
 u64 bn_div_words(u64 h, u64 l, u64 d);
-u64 bn_sub_words(u64 *r, u64 *a, u64 *b, int n);
+u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n);
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,int n);
 
 bool bn_div_fixed_top(BIGNUM *dv,
                       BIGNUM *rm,
                       const BIGNUM *num,
                       const BIGNUM *divisor);
-bool bn_is_odd(const BIGNUM *a);
+bool BN_is_odd(const BIGNUM *a);
 bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n);
 bool bn_rshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n);

@@ -18,7 +18,7 @@ bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n) {
   int i, nw;
   unsigned int lb, rb;
   u64 *t, *f;
-  u64 l, m, rmask = 0;
+  u64 l, m, rmask;
 
   assert(n >= 0);
 

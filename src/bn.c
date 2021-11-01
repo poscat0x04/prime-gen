@@ -12,7 +12,7 @@ u64 *bn_expand_internal(BIGNUM *b, int words) {
   if (b->top > 0)
     memcpy(a, b->d, sizeof(*a) * b->top);
   return a;
-};
+}
 
 BIGNUM *bn_expand2(BIGNUM *b, int words) {
   if (words > b->dmax) {
@@ -118,7 +118,7 @@ void bn_correct_top(BIGNUM *a) {
     a->neg = false;
 }
 
-bool bn_is_odd(const BIGNUM *a) { return (a->top > 0) & (a->d[0] & 1); }
+bool BN_is_odd(const BIGNUM *a) { return (a->top > 0) & (a->d[0] & 1); }
 
 bool BN_is_zero(const BIGNUM *a) { return a->top == 0; }
 

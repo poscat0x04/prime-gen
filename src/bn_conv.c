@@ -6,7 +6,6 @@ const char Hex[] = "0123456789ABCDEF";
 
 int BN_dec2bn(BIGNUM **bn, const char *a) {
   BIGNUM *ret = NULL;
-  u64 l = 0;
   int neg = 0, i, j;
   int num;
 
@@ -46,7 +45,7 @@ int BN_dec2bn(BIGNUM **bn, const char *a) {
   j = BN_DEC_NUM - i % BN_DEC_NUM;
   if (j == BN_DEC_NUM)
     j = 0;
-  l = 0;
+  u64 l = 0;
   while (--i >= 0) {
     l *= 10;
     l += *a - '0';
@@ -72,7 +71,7 @@ err:
 }
 
 char *BN_bn2dec(const BIGNUM *a) {
-  int i = 0, num, ok = 0, n, tbytes;
+  int num, ok = 0, n, tbytes;
   char *buf = NULL;
   char *p;
   BIGNUM *t = NULL;
@@ -84,7 +83,7 @@ char *BN_bn2dec(const BIGNUM *a) {
    *     <= 3 * BN_num_bits(a) * 0.101 + log(2) + 1     (rounding error)
    *     <= 3 * BN_num_bits(a) / 10 + 3 * BN_num_bits / 1000 + 1 + 1
    */
-  i = BN_num_bits(a) * 3;
+  int i = BN_num_bits(a) * 3;
   num = (i / 10 + i / 1000 + 1) + 1;
   tbytes = num + 3; /* negative and terminator and one spare? */
   bn_data_num = num / BN_DEC_NUM + 1;
@@ -100,7 +99,7 @@ char *BN_bn2dec(const BIGNUM *a) {
   lp = bn_data;
   if (BN_is_zero(t)) {
     *p++ = '0';
-    *p++ = '\0';
+    *p = '\0';
   } else {
     if (BN_is_negative(t))
       *p++ = '-';
