@@ -6,7 +6,7 @@
 
 #define LBITS(a) ((a)&BN_MASK2l)
 #define HBITS(a) (((a) >> BN_BITS4) & BN_MASK2l)
-#define L2HBITS(a) (((a) << BN_BITS4) & BN_MASK2)
+#define L2HBITS(a) (((a) << BN_BITS4) )
 
 #define mul(r, a, bl, bh, c)                                                   \
   {                                                                            \
@@ -24,12 +24,12 @@
       lt = (bl) * (lt);                                                        \
       m1 = (bl) * (ht);                                                        \
       ht = (bh) * (ht);                                                        \
-      m = (m + m1) & BN_MASK2;                                                 \
+      m = (m + m1) ;                                                 \
       if (m < m1)                                                              \
         ht += L2HBITS((u64)1);                                                 \
       ht += HBITS(m);                                                          \
       m1 = L2HBITS(m);                                                         \
-      lt = (lt + m1) & BN_MASK2;                                               \
+      lt = (lt + m1) ;                                               \
       if (lt < m1)                                                             \
         ht++;                                                                  \
       (l) = lt;                                                                \
@@ -37,10 +37,10 @@
     }                                                                          \
     /* non-multiply part */                                                    \
     l += (c);                                                                  \
-    if ((l & BN_MASK2) < (c))                                                  \
+    if ((l ) < (c))                                                  \
       h++;                                                                     \
-    (c) = h & BN_MASK2;                                                        \
-    (r) = l & BN_MASK2;                                                        \
+    (c) = h ;                                                        \
+    (r) = l ;                                                        \
   }
 
 #define BN_alloca(val)                                                         \
@@ -61,7 +61,6 @@ extern const int BN_BYTES;
 extern const int BN_BITS2;
 extern const int BN_BITS4;
 
-extern const unsigned long long BN_MASK2;
 extern const long BN_MASK2l;
 extern const unsigned long long BN_MASK2h;
 

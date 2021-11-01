@@ -39,9 +39,9 @@ bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
     for (i = a->top - 1; i > 0; i--) {
       m = l << lb;
       l = f[i - 1];
-      t[i] = (m | ((l >> rb) & rmask)) & BN_MASK2;
+      t[i] = (m | ((l >> rb) & rmask)) ;
     }
-    t[0] = (l << lb) & BN_MASK2;
+    t[0] = (l << lb) ;
   } else {
     /* shouldn't happen, but formally required */
     r->d[nw] = 0;

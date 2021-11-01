@@ -15,7 +15,7 @@ static int bn_left_align(BIGINT *num) {
 
   for (i = 0, m = 0; i < top; i++) {
     n = d[i];
-    d[i] = ((n << lshift) | m) & BN_MASK2;
+    d[i] = ((n << lshift) | m) ;
     m = (n >> rshift) & rmask;
   }
 
@@ -132,7 +132,7 @@ bool bn_div_fixed_top(BIGINT *dv,
     n0 = wnumtop[0];
     n1 = wnumtop[-1];
     if (n0 == d0)
-      q = BN_MASK2;
+      q = UINT64_MAX;
     else {                  /* n0 < d0 */
       u64 n2 = (wnumtop == wnum) ? 0 : wnumtop[-2];
       u64 t2l, t2h;

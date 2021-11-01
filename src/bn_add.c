@@ -88,7 +88,7 @@ bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b)
   while (dif) {
     dif--;
     t1 = *(ap++);
-    t2 = (t1 + carry) & BN_MASK2;
+    t2 = (t1 + carry) ;
     *(rp++) = t2;
     carry &= (t2 == 0);
   }
@@ -129,7 +129,7 @@ bool BN_usub(BIGINT *r, const BIGINT *a, const BIGINT *b)
   while (dif) {
     dif--;
     t1 = *(ap++);
-    t2 = (t1 - borrow) & BN_MASK2;
+    t2 = (t1 - borrow) ;
     *(rp++) = t2;
     borrow &= (t1 == 0);
   }

@@ -6,8 +6,6 @@ bool BN_add_word(BIGINT *a, u64 w) {
   u64 l;
   int i;
 
-  w &= BN_MASK2;
-
   if (!w)
     return true;
   if (BN_is_zero(a))
@@ -21,7 +19,7 @@ bool BN_add_word(BIGINT *a, u64 w) {
     return r;
   }
   for (i = 0; w != 0 && i < a->top; i++) {
-    a->d[i] = l = (a->d[i] + w) & BN_MASK2;
+    a->d[i] = l = (a->d[i] + w) ;
     w = (w > l) ? 1 : 0;
   }
   // overflow
@@ -36,8 +34,6 @@ bool BN_add_word(BIGINT *a, u64 w) {
 
 bool BN_sub_word(BIGINT *a, u64 w) {
   int i;
-
-  w &= BN_MASK2;
 
   if (!w)
     return true;
@@ -67,7 +63,7 @@ bool BN_sub_word(BIGINT *a, u64 w) {
       a->d[i] -= w;
       break;
     } else {
-      a->d[i] = (a->d[i] - w) & BN_MASK2;
+      a->d[i] = (a->d[i] - w) ;
       i++;
       w = 1;
     }
@@ -80,7 +76,6 @@ bool BN_sub_word(BIGINT *a, u64 w) {
 bool BN_mul_word(BIGINT *a, u64 w) {
   u64 ll;
 
-  w &= BN_MASK2;
   if (a->top) {
     if (w == 0)
       BN_zero(a);
@@ -130,8 +125,6 @@ u64 BN_div_word(BIGINT *a, u64 w) {
   u64 ret = 0;
   int i, j;
 
-  w &= BN_MASK2;
-
   if (!w)
     /* actually this an error (division by zero) */
     return (u64)-1;
@@ -149,7 +142,7 @@ u64 BN_div_word(BIGINT *a, u64 w) {
 
     l = a->d[i];
     d = bn_div_words(ret, l, w);
-    ret = (l - ((d * w) & BN_MASK2)) & BN_MASK2;
+    ret = (l - ((d * w) )) ;
     a->d[i] = d;
   }
   if ((a->top > 0) && (a->d[a->top - 1] == 0))
@@ -165,7 +158,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   int i, count = 2;
 
   if (d == 0)
-    return BN_MASK2;
+    return UINT64_MAX;
 
   i = BN_num_bits_word(d);
   assert((i == BN_BITS2) || (h <= (u64)1 << i));
@@ -215,7 +208,7 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
       break;
 
     ret = q << BN_BITS4;
-    h = ((h << BN_BITS4) | (l >> BN_BITS4)) & BN_MASK2;
+    h = ((h << BN_BITS4) | (l >> BN_BITS4)) ;
     l = (l & BN_MASK2l) << BN_BITS4;
   }
   ret |= q;
@@ -232,7 +225,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   while (true) {
     t1 = a[0];
     t2 = b[0];
-    r[0] = (t1 - t2 - c) & BN_MASK2;
+    r[0] = (t1 - t2 - c) ;
     if (t1 != t2)
       c = (t1 < t2);
     if (--n <= 0)
@@ -240,7 +233,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
 
     t1 = a[1];
     t2 = b[1];
-    r[1] = (t1 - t2 - c) & BN_MASK2;
+    r[1] = (t1 - t2 - c) ;
     if (t1 != t2)
       c = (t1 < t2);
     if (--n <= 0)
@@ -248,7 +241,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
 
     t1 = a[2];
     t2 = b[2];
-    r[2] = (t1 - t2 - c) & BN_MASK2;
+    r[2] = (t1 - t2 - c) ;
     if (t1 != t2)
       c = (t1 < t2);
     if (--n <= 0)
@@ -256,7 +249,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
 
     t1 = a[3];
     t2 = b[3];
-    r[3] = (t1 - t2 - c) & BN_MASK2;
+    r[3] = (t1 - t2 - c) ;
     if (t1 != t2)
       c = (t1 < t2);
     if (--n <= 0)
@@ -281,9 +274,9 @@ u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,
 
   while (n) {
     t = a[0];
-    t = (t + c) & BN_MASK2;
+    t = (t + c) ;
     c = (t < c);
-    l = (t + b[0]) & BN_MASK2;
+    l = (t + b[0]) ;
     c += (l < t);
     r[0] = l;
     a++;
