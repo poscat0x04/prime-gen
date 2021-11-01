@@ -54,3 +54,44 @@ bool bn_lshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n) {
 
   return true;
 }
+
+bool bn_rshift_fixed_top(BIGNUM *r, const BIGNUM *a, int n)
+{
+  int i, top, nw;
+  unsigned int lb, rb;
+  u64 *t, *f;
+  u64 l, m, mask;
+
+  assert(n >= 0);
+
+  nw = n / BN_BITS2;
+  if (nw >= a->top) {
+    /* shouldn't happen, but formally required */
+    BN_zero(r);
+    return true;
+  }
+
+  rb = (unsigned int)n % BN_BITS2;
+  lb = BN_BITS2 - rb;
+  lb %= BN_BITS2;            /* say no to undefined behaviour */
+  mask = (u64)0 - lb;   /* mask = 0 - (lb != 0) */
+  mask |= mask >> 8;
+  top = a->top - nw;
+  if (r != a && bn_wexpand(r, top) == NULL)
+    return false;
+
+  t = &(r->d[0]);
+  f = &(a->d[nw]);
+  l = f[0];
+  for (i = 0; i < top - 1; i++) {
+    m = f[i + 1];
+    t[i] = (l >> rb) | ((m << lb) & mask);
+    l = m;
+  }
+  t[i] = l >> rb;
+
+  r->neg = a->neg;
+  r->top = top;
+
+  return true;
+}

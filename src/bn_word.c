@@ -221,3 +221,106 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   ret |= q;
   return ret;
 }
+
+u64 bn_sub_words(u64 *r, u64 *a, u64 *b, int n) {
+  u64 t1, t2;
+  int c = 0;
+
+  if (n <= 0)
+    return (u64)0;
+
+  for (;;) {
+    t1 = a[0];
+    t2 = b[0];
+    r[0] = (t1 - t2 - c) & BN_MASK2;
+    if (t1 != t2)
+      c = (t1 < t2);
+    if (--n <= 0)
+      break;
+
+    t1 = a[1];
+    t2 = b[1];
+    r[1] = (t1 - t2 - c) & BN_MASK2;
+    if (t1 != t2)
+      c = (t1 < t2);
+    if (--n <= 0)
+      break;
+
+    t1 = a[2];
+    t2 = b[2];
+    r[2] = (t1 - t2 - c) & BN_MASK2;
+    if (t1 != t2)
+      c = (t1 < t2);
+    if (--n <= 0)
+      break;
+
+    t1 = a[3];
+    t2 = b[3];
+    r[3] = (t1 - t2 - c) & BN_MASK2;
+    if (t1 != t2)
+      c = (t1 < t2);
+    if (--n <= 0)
+      break;
+
+    a += 4;
+    b += 4;
+    r += 4;
+  }
+  return c;
+}
+
+u64 bn_add_words(u64 *r, const u64 *a, const u64 *b,
+                      int n) {
+  u64 c, l, t;
+
+  assert(n >= 0);
+  if (n <= 0)
+    return (u64)0;
+
+  c = 0;
+
+  while (n & ~3) {
+    t = a[0];
+    t = (t + c) & BN_MASK2;
+    c = (t < c);
+    l = (t + b[0]) & BN_MASK2;
+    c += (l < t);
+    r[0] = l;
+    t = a[1];
+    t = (t + c) & BN_MASK2;
+    c = (t < c);
+    l = (t + b[1]) & BN_MASK2;
+    c += (l < t);
+    r[1] = l;
+    t = a[2];
+    t = (t + c) & BN_MASK2;
+    c = (t < c);
+    l = (t + b[2]) & BN_MASK2;
+    c += (l < t);
+    r[2] = l;
+    t = a[3];
+    t = (t + c) & BN_MASK2;
+    c = (t < c);
+    l = (t + b[3]) & BN_MASK2;
+    c += (l < t);
+    r[3] = l;
+    a += 4;
+    b += 4;
+    r += 4;
+    n -= 4;
+  }
+
+  while (n) {
+    t = a[0];
+    t = (t + c) & BN_MASK2;
+    c = (t < c);
+    l = (t + b[0]) & BN_MASK2;
+    c += (l < t);
+    r[0] = l;
+    a++;
+    b++;
+    r++;
+    n--;
+  }
+  return (u64)c;
+}
