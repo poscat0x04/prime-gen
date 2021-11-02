@@ -44,7 +44,7 @@ bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y, const BIGINT *a, const BI
       goto end;
   }
 
-  if (BN_copy(gcd, old_r) == NULL)
+  if (gcd != NULL && BN_copy(gcd, old_r) == NULL)
     goto end;
   if (!BN_mul(tmp1, old_x, a)
       || !BN_sub(tmp2, old_r, tmp1))
@@ -58,12 +58,12 @@ bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y, const BIGINT *a, const BI
   }
 
   if (swapped) {
-    if (BN_move(coe_y, old_x) == NULL
-        || BN_move(coe_x, y) == NULL)
+    if ((coe_y != NULL && BN_move(coe_y, old_x) == NULL)
+        || (coe_x != NULL && BN_move(coe_x, y) == NULL))
       goto end;
   } else {
-    if (BN_move(coe_x, old_x) == NULL
-        || BN_move(coe_y, y))
+    if ((coe_x != NULL && BN_move(coe_x, old_x) == NULL)
+        || (coe_y != NULL && BN_move(coe_y, y) == NULL))
       goto end;
   }
   res = true;
