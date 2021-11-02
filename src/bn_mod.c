@@ -12,3 +12,10 @@ bool BN_mod(BIGINT *r, const BIGINT *m, const BIGINT *d) {
     return true;
   return (d->neg ? BN_sub : BN_add)(r, r, d);
 }
+
+bool BN_mod_sqr(BIGINT *r, const BIGINT *a, const BIGINT *m)
+{
+  if (!BN_sqr(r, a))
+    return false;
+  return BN_mod(r, r, m);
+}

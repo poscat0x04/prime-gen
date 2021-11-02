@@ -134,6 +134,7 @@ bool BN_div(BIGINT *dv, BIGINT *rm, const BIGINT *num, const BIGINT *divisor);
 bool BN_sqr(BIGINT *r, const BIGINT *a);
 
 bool BN_mod(BIGINT *r, const BIGINT *m, const BIGINT *d);
+bool BN_mod_sqr(BIGINT *r, const BIGINT *a, const BIGINT *m);
 
 bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
 
