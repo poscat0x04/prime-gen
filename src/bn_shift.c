@@ -56,6 +56,19 @@ bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   return true;
 }
 
+bool BN_rshift(BIGINT *r, const BIGINT *a, int n) {
+  bool ret = false;
+
+  if (n < 0) {
+    return false;
+  }
+
+  ret = bn_rshift_fixed_top(r, a, n);
+
+  bn_correct_top(r);
+  return ret;
+}
+
 bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   int i, top, nw;
   unsigned int lb, rb;

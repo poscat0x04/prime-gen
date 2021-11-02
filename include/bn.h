@@ -146,8 +146,9 @@ bool BN_sqr(BIGINT *r, const BIGINT *a);
 bool BN_mod(BIGINT *r, const BIGINT *m, const BIGINT *d);
 bool BN_mod_sqr(BIGINT *r, const BIGINT *a, const BIGINT *m);
 
-bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
+bool BN_rshift(BIGINT *r, const BIGINT *a, int n);
 bool BN_rshift_digits(BIGINT *r, const BIGINT *a, int digits);
+bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
 bool BN_lshift_digits(BIGINT *r, const BIGINT *a, int digits);
 
 int BN_num_bits(const BIGINT *a);
