@@ -97,6 +97,12 @@ bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
 }
 
 bool BN_rshift_digits(BIGINT *r, const BIGINT *a, int digits) {
+  if (digits == 0) {
+    return true;
+  }
+
+  assert(digits > 0);
+
   BIGINT *rr;
   bool ret = false;
 
@@ -115,6 +121,37 @@ bool BN_rshift_digits(BIGINT *r, const BIGINT *a, int digits) {
     if (memcpy(rr->d, dp, l * sizeof(*dp)) != NULL)
       ret = true;
   }
+
+  if (r == a) {
+    if (BN_copy(r, rr) == NULL)
+      ret = false;
+    BN_free_alloca(rr);
+  }
+  return ret;
+}
+
+bool BN_lshift_digits(BIGINT *r, const BIGINT *a, int digits) {
+  if (digits == 0) {
+    return true;
+  }
+
+  assert(digits > 0);
+
+  BIGINT *rr;
+  bool ret = false;
+  if (r == a)
+    BN_alloca(rr)
+  else
+    rr = r;
+
+  int l = a->top + digits;
+  bn_wexpand(rr, l);
+  rr->top = l;
+  u64 *dp = rr->d;
+  memset(rr->d,0, digits *sizeof(*rr->d));
+  dp += digits;
+  if (memcpy(dp, a->d, a->top * sizeof(*dp)) != NULL)
+    ret = true;
 
   if (r == a) {
     if (BN_copy(r, rr) == NULL)

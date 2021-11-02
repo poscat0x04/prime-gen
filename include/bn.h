@@ -144,6 +144,7 @@ bool BN_mod_sqr(BIGINT *r, const BIGINT *a, const BIGINT *m);
 
 bool BN_lshift(BIGINT *r, const BIGINT *a, int n);
 bool BN_rshift_digits(BIGINT *r, const BIGINT *a, int digits);
+bool BN_lshift_digits(BIGINT *r, const BIGINT *a, int digits);
 
 int BN_num_bits(const BIGINT *a);
 int BN_num_bits_word(u64 w);

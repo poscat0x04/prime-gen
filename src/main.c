@@ -10,8 +10,8 @@ int main(void) {
   BN_sqr(r, a);
   BN_print(r);
   putchar('\n');
-  BN_add_word(a, 1);
-  BN_rshift_digits(a, a, 1);
+  BN_set_word(a, 1);
+  BN_lshift_digits(a, a, 1);
   BN_print(a);
   BN_free_allocas(2, r, a);
   return 0;
