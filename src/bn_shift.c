@@ -1,4 +1,5 @@
 #include "bn.h"
+#include <alloca.h>
 #include <assert.h>
 #include <string.h>
 
@@ -27,10 +28,10 @@ bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
     return 0;
 
   if (a->top != 0) {
-    lb = (unsigned int)n % BN_BITS2;
+    lb = (unsigned int) n % BN_BITS2;
     rb = BN_BITS2 - lb;
     rb %= BN_BITS2;      /* say no to undefined behaviour */
-    rmask = (u64)0 - rb; /* rmask = 0 - (rb != 0) */
+    rmask = (u64) 0 - rb; /* rmask = 0 - (rb != 0) */
     rmask |= rmask >> 8;
     f = &(a->d[0]);
     t = &(r->d[nw]);
@@ -39,9 +40,9 @@ bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
     for (i = a->top - 1; i > 0; i--) {
       m = l << lb;
       l = f[i - 1];
-      t[i] = (m | ((l >> rb) & rmask)) ;
+      t[i] = (m | ((l >> rb) & rmask));
     }
-    t[0] = (l << lb) ;
+    t[0] = (l << lb);
   } else {
     /* shouldn't happen, but formally required */
     r->d[nw] = 0;
@@ -70,10 +71,10 @@ bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
     return true;
   }
 
-  rb = (unsigned int)n % BN_BITS2;
+  rb = (unsigned int) n % BN_BITS2;
   lb = BN_BITS2 - rb;
   lb %= BN_BITS2;            /* say no to undefined behaviour */
-  mask = (u64)0 - lb;   /* mask = 0 - (lb != 0) */
+  mask = (u64) 0 - lb;   /* mask = 0 - (lb != 0) */
   mask |= mask >> 8;
   top = a->top - nw;
   if (r != a && bn_wexpand(r, top) == NULL)
@@ -93,4 +94,32 @@ bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n) {
   r->top = top;
 
   return true;
+}
+
+bool BN_rshift_digits(BIGINT *r, const BIGINT *a, int digits) {
+  BIGINT *rr;
+  bool ret = false;
+
+  if (r == a)
+    BN_alloca(rr)
+  else
+    rr = r;
+
+  int l = a->top - digits;
+  if (l <= 0) {
+    ret = BN_zero(rr);
+  } else {
+    bn_wexpand(rr, l);
+    rr->top = l;
+    u64 *dp = &(a->d[digits]);
+    if (memcpy(rr->d, dp, l * sizeof(*dp)) != NULL)
+      ret = true;
+  }
+
+  if (r == a) {
+    if (BN_copy(r, rr) == NULL)
+      ret = false;
+    BN_free_alloca(rr);
+  }
+  return ret;
 }
