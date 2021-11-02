@@ -113,6 +113,7 @@ BIGINT *BN_copy(BIGINT *a, const BIGINT *b);
 bool BN_set_word(BIGINT *a, u64 w);
 #define BN_zero(a) (BN_set_word((a), 0))
 void BN_set_negative(BIGINT *a, bool neg);
+void BN_invert(BIGINT *a);
 
 int BN_dec2bn(BIGINT **bn, const char *str);
 char *BN_bn2dec(const BIGINT *a);

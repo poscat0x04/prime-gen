@@ -138,6 +138,10 @@ void BN_set_negative(BIGINT *a, bool neg) {
   }
 }
 
+void BN_invert(BIGINT *a) {
+  a->neg = !a->neg;
+}
+
 /// Sets the dmax of a bigint to the highest significant digit
 /// \param a The bigint
 void bn_correct_top(BIGINT *a) {
