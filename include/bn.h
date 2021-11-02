@@ -131,6 +131,7 @@ bool BN_usub(BIGINT *r, const BIGINT *a, const BIGINT *b);
 bool BN_sub(BIGINT *r, const BIGINT *a, const BIGINT *b);
 bool BN_mul(BIGINT *r, const BIGINT *a, const BIGINT *b);
 bool BN_div(BIGINT *dv, BIGINT *rm, const BIGINT *num, const BIGINT *divisor);
+bool BN_sqr(BIGINT *r, const BIGINT *a);
 
 bool BN_mod(BIGINT *r, const BIGINT *m, const BIGINT *d);
 
@@ -142,13 +143,16 @@ int BN_num_bits_word(u64 w);
 bool BN_is_zero(const BIGINT *a);
 bool BN_is_negative(const BIGINT *a);
 
-u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
-u64 bn_mul_add_words(u64 *rp, const u64 *ap, int num, u64 w);
-void bn_mul_normal(u64 *r, u64 *a, int na, u64 *b, int nb);
 bool bn_mul_fixed_top(BIGINT *r, const BIGINT *a, const BIGINT *b);
+void bn_mul_normal(u64 *r, u64 *a, int na, u64 *b, int nb);
+bool bn_sqr_fixed_top(BIGINT *r, const BIGINT *a);
+void bn_sqr_normal(u64 *r, const u64 *a, int n, u64 *tmp);
 u64 bn_div_words(u64 h, u64 l, u64 d);
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n);
 u64 bn_add_words(u64 *r, const u64 *a, const u64 *b, int n);
+u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
+u64 bn_mul_add_words(u64 *rp, const u64 *ap, int num, u64 w);
+void bn_sqr_words(u64 *r, const u64 *a, int n);
 
 bool bn_div_fixed_top(BIGINT *dv,
                       BIGINT *rm,
