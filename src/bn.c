@@ -114,6 +114,22 @@ BIGINT *BN_copy(BIGINT *a, const BIGINT *b) {
   return a;
 }
 
+inline void BN_clear(BIGINT *a) {
+  memset(a, 0, sizeof(*a));
+}
+
+BIGINT *BN_move(BIGINT *a, BIGINT *b) {
+  if (a == b)
+    return NULL;
+  if (a->d != NULL)
+    free(a->d);
+  a->d = b->d;
+  a->neg = b->neg;
+  a->top = b->top;
+  BN_clear(b);
+  return a;
+}
+
 /// Sets the value of a bigint to a u64 integer
 /// \param a The bigint to set
 /// \param w The u64 integer

@@ -109,6 +109,8 @@ void BN_free_allocas(int count, ...);
 BIGINT *BN_new(void);
 BIGINT *BN_dup(const BIGINT *a);
 BIGINT *BN_copy(BIGINT *a, const BIGINT *b);
+void BN_clear(BIGINT *a);
+BIGINT *BN_move(BIGINT *a, BIGINT *b);
 
 bool BN_set_word(BIGINT *a, u64 w);
 #define BN_zero(a) (BN_set_word((a), 0))
