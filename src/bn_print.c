@@ -18,6 +18,15 @@ bool BN_print_file(const BIGINT *a, FILE *file) {
 /// Prints a bignum to stdout
 /// \param a The bignum to print
 /// \return Whether the operation is successful
-bool BN_print(const BIGINT* a) {
+bool BN_print(const BIGINT *a) {
   return BN_print_file(a, stdout);
+}
+
+/// Prints a bitnum and a line break to stdout
+bool BN_println(const BIGINT *a) {
+  if (BN_print_file(a, stdout)) {
+    putchar('\n');
+    return true;
+  } else
+    return false;
 }

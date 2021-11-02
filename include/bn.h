@@ -123,6 +123,7 @@ char *BN_bn2hex(const BIGINT *a);
 
 bool BN_print_file(const BIGINT *a, FILE *file);
 bool BN_print(const BIGINT *a);
+bool BN_println(const BIGINT *a);
 
 // set dmax to point to the last non-zero digit
 void bn_correct_top(BIGINT *a);
