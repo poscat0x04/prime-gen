@@ -53,6 +53,12 @@ typedef uint64_t u64;
     memset(val, 0, sizeof(*(val)));                                            \
   }
 
+/// Declares and initializes a bigint on stack
+#define BN_init(val)                                                           \
+    BIGINT *(val);                                                             \
+    BN_alloca(val)                                                             \
+
+
 // floor(log10(2^64))
 extern const int BN_DEC_NUM;
 // 10^BN_DEC_NUM
