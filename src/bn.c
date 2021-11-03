@@ -215,6 +215,20 @@ int BN_ucmp(const BIGINT *a, const BIGINT *b) {
   return 0;
 }
 
+int BN_cmp_word(const BIGINT *a, u64 w) {
+  assert(a != NULL);
+  if (a->top == 0)
+    return -1;
+  else if (a->top > 1)
+    return 1;
+  else if (a->d[0] > w)
+    return 1;
+  else if (a->d[0] < w)
+    return -1;
+  else
+    return 0;
+}
+
 bool BN_eq(const BIGINT *a, const BIGINT *b) {
   if (a->neg != b->neg || a->top != b->top)
    return false;
