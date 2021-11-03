@@ -68,3 +68,25 @@ end:
   }
   return ret;
 }
+
+bool to_mont(MONT *r, const BIGINT *a, const MONT_PARAMS *params) {
+  BIGINT *rr;
+  bool ret = false;
+  if (r == a) {
+    BN_alloca(rr)
+    BN_clear(rr);
+  } else
+    rr = r;
+
+  if (!BN_mod(rr, a, &params->N)
+      || !BN_mul(rr, rr, &params->RR)
+      || !REDC(rr, rr, params))
+    goto end;
+  if (r == a)
+    BN_move(r, rr);
+  ret = true;
+end:
+  if (!ret && r == a)
+    BN_free_alloca(rr);
+  return ret;
+}
