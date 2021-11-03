@@ -34,6 +34,7 @@ void seed(void);
 u64 next(void);
 RNG_PARAMS *to_rng_params(const BIGINT *a);
 bool bn_gen(BIGINT *r, const RNG_PARAMS *params);
+bool bn_gen_pred(BIGINT *r, const RNG_PARAMS *params, bool (*pred)(const BIGINT *));
 
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);

@@ -69,3 +69,11 @@ bool bn_gen(BIGINT *r, const RNG_PARAMS *params) {
   r->top = params->digits;
   return true;
 }
+
+bool bn_gen_pred(BIGINT *r, const RNG_PARAMS *params, bool (*pred)(const BIGINT *)) {
+  do {
+    if (!bn_gen(r, params))
+      return false;
+  } while (!pred(r));
+  return true;
+}
