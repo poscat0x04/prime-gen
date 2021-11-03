@@ -1,6 +1,7 @@
 #include "prime.h"
 #include "alloca.h"
 #include "string.h"
+#include "assert.h"
 
 MONT_PARAMS *init_mont(const BIGINT *n) {
   MONT_PARAMS *params = malloc(sizeof(MONT_PARAMS));
@@ -34,4 +35,35 @@ void free_mont(MONT_PARAMS *params) {
   BN_free_alloca(&params->N);
   BN_free_alloca(&params->Ni);
   free(params);
+}
+
+bool REDC(BIGINT *r, const BIGINT *t, MONT_PARAMS *params) {
+  assert(!BN_is_negative(t));
+
+  BIGINT *rr;
+  if (r == t)
+    BN_alloca(rr)
+  else
+    rr = r;
+
+  bool ret = false;
+  int digits = params->R.top;
+
+  if(!BN_mod_digits(rr, t, digits)
+     || !BN_mul(rr, rr, &params->Ni)
+     || !BN_mod_digits(rr, rr, digits)
+     || !BN_mul(rr, rr, &params->N)
+     || !BN_add(rr, rr, t)
+     || !BN_rshift_digits(rr, rr, digits))
+    goto end;
+  if (BN_ucmp(rr, &params->N) >= 0) {
+    if (!BN_sub(rr, rr, &params->N))
+      goto end;
+  }
+  ret = true;
+end:
+  if (ret && r == t) {
+    BN_move(r, rr);
+  }
+  return ret;
 }
