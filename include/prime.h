@@ -23,5 +23,8 @@ bool MONT_exp(MONT *r, const MONT *a, const BIGINT *e, const MONT_PARAMS *params
 bool BN_mod_exp(BIGINT *r, const BIGINT *a, const BIGINT *e, const BIGINT *m);
 bool BN_mod_exp_mont(BIGINT *r, const BIGINT *a, const BIGINT *e, const MONT_PARAMS *params);
 
+void seed(void);
+u64 next(void);
+
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);
