@@ -37,6 +37,18 @@ BIGINT *bn_wexpand(BIGINT *a, int words) {
   return (words <= a->dmax) ? a : bn_expand2(a, words);
 }
 
+BIGINT *bn_expand_nocpy(BIGINT *a, int words) {
+  if (words > (INT_MAX / (4 * BN_BITS2))) {
+    return NULL;
+  }
+  if (a->d != NULL)
+    free(a->d);
+  if ((a->d = malloc(words * sizeof(*a->d))) == NULL)
+    return NULL;
+  a->dmax = words;
+  return a;
+}
+
 /// Frees a heap allocated bignum
 /// \param a The heap allocated bignum to free
 void BN_free(BIGINT *a) {

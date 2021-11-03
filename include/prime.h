@@ -10,7 +10,14 @@ struct mont_params_t {
   MONT One;
 };
 
+struct rng_params_t {
+  int digits;
+  u64 highest_digit;
+  u64 hd_used_bits;
+};
+
 typedef struct mont_params_t MONT_PARAMS;
+typedef struct rng_params_t RNG_PARAMS;
 
 MONT_PARAMS *init_mont(const BIGINT *n);
 void free_mont(MONT_PARAMS *params);
@@ -25,6 +32,8 @@ bool BN_mod_exp_mont(BIGINT *r, const BIGINT *a, const BIGINT *e, const MONT_PAR
 
 void seed(void);
 u64 next(void);
+RNG_PARAMS *to_rng_params(const BIGINT *a);
+bool bn_gen(BIGINT *r, const RNG_PARAMS *params);
 
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);

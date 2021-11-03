@@ -16,8 +16,12 @@ int main(void) {
   BN_println(x);
   BN_println(y);
   BN_set_word(a, 99);
-  BN_set_word(y, 1000000);
+  BN_set_word(y, 65536);
   BN_mod_exp(b, b, y, a);
   BN_println(b);
+  seed();
+  RNG_PARAMS *params = to_rng_params(y);
+  bn_gen(a, params);
+  BN_println(a);
   return 0;
 }

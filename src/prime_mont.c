@@ -14,7 +14,6 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
   BN_clear(R);
   BN_clear(N);
   BN_clear(Ni);
-  BN_clear(gcd);
   if (!BN_set_word(R, 1)
       || !BN_lshift_digits(R, R, n->top)
       || BN_copy(N, n) == NULL)

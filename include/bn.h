@@ -92,6 +92,7 @@ extern const BIGINT C_BN_two;
 u64 *bn_expand_internal(BIGINT *b, int word);
 BIGINT *bn_expand2(BIGINT *b, int word);
 BIGINT *bn_wexpand(BIGINT *a, int word);
+BIGINT *bn_expand_nocpy(BIGINT *a, int word);
 /// Expands the max size of a bignum
 /// \param a The bignum to expand
 /// \param bits The size of the bignum, in bits
