@@ -182,3 +182,27 @@ end:
     BN_free_alloca(rr);
   return ret;
 }
+
+bool BN_mod_exp_mont(BIGINT *r, const BIGINT *a, const BIGINT *e, const MONT_PARAMS *params) {
+  MONT *rr;
+  bool ret = false;
+
+  if (r == a) {
+    BN_alloca(rr)
+    BN_clear(rr);
+  } else
+    rr = r;
+
+  if (!to_mont(rr, a, params)
+      || !MONT_exp(rr, rr, e, params)
+      || !from_mont(rr, rr, params))
+    goto end;
+
+  if (r == a)
+    BN_move(r, rr);
+  ret = true;
+end:
+  if (!ret && r == a)
+    BN_free_alloca(rr);
+  return ret;
+}
