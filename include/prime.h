@@ -2,6 +2,7 @@
 
 struct mont_params_t {
   BIGINT R;
+  BIGINT RR;
   BIGINT N;
   BIGINT Ni;
 };

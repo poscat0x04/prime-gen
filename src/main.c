@@ -14,7 +14,13 @@ int main(void) {
   extgcd(gcd, x, y, a, b);
   BN_println(gcd);
   BN_println(x);
-  assert(init_mont(b) != NULL);
   BN_println(y);
+  BN_set_word(a, 99);
+  MONT_PARAMS *params = init_mont(a);
+  assert(params != NULL);
+  BN_println(&params->N);
+  BN_println(&params->Ni);
+  BN_println(&params->R);
+  BN_println(&params->RR);
   return 0;
 }

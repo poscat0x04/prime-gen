@@ -3,21 +3,30 @@
 #include "string.h"
 
 MONT_PARAMS *init_mont(const BIGINT *n) {
-  MONT_PARAMS* params = malloc(sizeof(MONT_PARAMS));
+  MONT_PARAMS *params = malloc(sizeof(MONT_PARAMS));
   BIGINT *R = &params->R;
+  BIGINT *RR = &params->RR;
   BIGINT *N = &params->N;
   BIGINT *Ni = &params->Ni;
+  BN_init(gcd)
   BN_clear(R);
   BN_clear(N);
   BN_clear(Ni);
-  BN_set_word(R, 1);
-  BN_lshift_digits(R, R, n->top);
-  BN_copy(N, n);
-  BN_init(gcd)
+  if(!BN_set_word(R, 1)
+     || !BN_lshift_digits(R, R, n->top)
+     || BN_copy(N, n) == NULL)
+    goto err;
   if (!extgcd(gcd, NULL, Ni, R, N) || gcd->dmax != 1 || gcd->d[0] != 1)
-    return NULL;
+    goto err;
   BN_invert(Ni);
+  if(!BN_mod_sqr(RR, R, N))
+    goto err;
+  BN_free_alloca(gcd);
   return params;
+err:
+  BN_free_allocas(5, R, RR, N, Ni, gcd);
+  free(params);
+  return NULL;
 }
 
 void free_mont(MONT_PARAMS *params) {
