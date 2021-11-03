@@ -9,6 +9,7 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
   BIGINT *RR = &params->RR;
   BIGINT *N = &params->N;
   BIGINT *Ni = &params->Ni;
+  MONT *One_mont = &params->One;
   BN_init(gcd)
   BN_clear(R);
   BN_clear(N);
@@ -21,6 +22,8 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
     goto err;
   BN_invert(Ni);
   if (!BN_mod_sqr(RR, R, N))
+    goto err;
+  if (!to_mont(One_mont, &C_BN_one, params))
     goto err;
   BN_free_alloca(gcd);
   return params;

@@ -1,14 +1,16 @@
 #include "bn.h"
 
+typedef BIGINT MONT;
+
 struct mont_params_t {
   BIGINT R;
   BIGINT RR;
   BIGINT N;
   BIGINT Ni;
+  MONT One;
 };
 
 typedef struct mont_params_t MONT_PARAMS;
-typedef BIGINT MONT;
 
 MONT_PARAMS *init_mont(const BIGINT *n);
 void free_mont(MONT_PARAMS *params);
