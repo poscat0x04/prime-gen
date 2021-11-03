@@ -14,6 +14,7 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
   BN_clear(R);
   BN_clear(N);
   BN_clear(Ni);
+  BN_clear(gcd);
   if (!BN_set_word(R, 1)
       || !BN_lshift_digits(R, R, n->top)
       || BN_copy(N, n) == NULL)
@@ -75,6 +76,7 @@ end:
 bool to_mont(MONT *r, const BIGINT *a, const MONT_PARAMS *params) {
   BIGINT *rr;
   bool ret = false;
+
   if (r == a) {
     BN_alloca(rr)
     BN_clear(rr);
@@ -144,6 +146,32 @@ bool MONT_exp(MONT *r, const MONT *a, const BIGINT *e, const MONT_PARAMS *params
         || !BN_rshift(e_tmp, e_tmp, 1))
       goto end;
   }
+
+  if (r == a)
+    BN_move(r, rr);
+  ret = true;
+end:
+  if (!ret && r == a)
+    BN_free_alloca(rr);
+  BN_free_allocas(2, a_tmp, e_tmp);
+  return ret;
+}
+
+bool BN_mod_exp(BIGINT *r, const BIGINT *a, const BIGINT *e, const BIGINT *m) {
+  MONT *rr;
+  bool ret = false;
+
+  if (r == a) {
+    BN_alloca(rr)
+    BN_clear(rr);
+  } else
+    rr = r;
+
+  MONT_PARAMS *params = init_mont(m);
+  if (!to_mont(rr, a, params)
+      || !MONT_exp(rr, rr, e, params)
+      || !from_mont(rr, rr, params))
+    goto end;
 
   if (r == a)
     BN_move(r, rr);

@@ -20,6 +20,7 @@ bool to_mont(MONT *r, const BIGINT *a, const MONT_PARAMS *params);
 
 bool MONT_mul(MONT *r, const MONT *a, const MONT *b, const MONT_PARAMS *params);
 bool MONT_exp(MONT *r, const MONT *a, const BIGINT *e, const MONT_PARAMS *params);
+bool BN_mod_exp(BIGINT *r, const BIGINT *a, const BIGINT *e, const BIGINT *m);
 
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);
