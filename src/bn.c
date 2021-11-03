@@ -120,7 +120,7 @@ inline void BN_clear(BIGINT *a) {
 
 BIGINT *BN_move(BIGINT *a, BIGINT *b) {
   if (a == b)
-    return NULL;
+    return a;
   if (a->d != NULL)
     free(a->d);
   a->d = b->d;
@@ -213,6 +213,16 @@ int BN_ucmp(const BIGINT *a, const BIGINT *b) {
     }
   }
   return 0;
+}
+
+bool BN_eq(const BIGINT *a, const BIGINT *b) {
+  if (a->neg != b->neg || a->top != b->top)
+   return false;
+  for (int i = 0; i < a->top; i++) {
+    if (a->d[i] != b->d[i])
+      return false;
+  }
+  return true;
 }
 
 /// Counts the number of bits a bigint uses

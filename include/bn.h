@@ -134,6 +134,7 @@ bool BN_mul_word(BIGINT *a, u64 w);
 u64 BN_div_word(BIGINT *a, u64 w);
 
 int BN_ucmp(const BIGINT *a, const BIGINT *b);
+bool BN_eq(const BIGINT *a, const BIGINT *b);
 
 bool BN_uadd(BIGINT *r, const BIGINT *a, const BIGINT *b);
 bool BN_add(BIGINT *r, const BIGINT *a, const BIGINT *b);
