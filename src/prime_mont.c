@@ -172,6 +172,7 @@ bool BN_mod_exp(BIGINT *r, const BIGINT *a, const BIGINT *e, const BIGINT *m) {
       || !MONT_exp(rr, rr, e, params)
       || !from_mont(rr, rr, params))
     goto end;
+  free_mont(params);
 
   if (r == a)
     BN_move(r, rr);
