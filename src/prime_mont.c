@@ -13,14 +13,14 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
   BN_clear(R);
   BN_clear(N);
   BN_clear(Ni);
-  if(!BN_set_word(R, 1)
-     || !BN_lshift_digits(R, R, n->top)
-     || BN_copy(N, n) == NULL)
+  if (!BN_set_word(R, 1)
+      || !BN_lshift_digits(R, R, n->top)
+      || BN_copy(N, n) == NULL)
     goto err;
   if (!extgcd(gcd, NULL, Ni, R, N) || gcd->dmax != 1 || gcd->d[0] != 1)
     goto err;
   BN_invert(Ni);
-  if(!BN_mod_sqr(RR, R, N))
+  if (!BN_mod_sqr(RR, R, N))
     goto err;
   BN_free_alloca(gcd);
   return params;
@@ -37,24 +37,25 @@ void free_mont(MONT_PARAMS *params) {
   free(params);
 }
 
-bool REDC(BIGINT *r, const BIGINT *t, MONT_PARAMS *params) {
+bool REDC(BIGINT *r, const BIGINT *t, const MONT_PARAMS *params) {
   assert(!BN_is_negative(t));
 
   BIGINT *rr;
-  if (r == t)
+  if (r == t) {
     BN_alloca(rr)
-  else
+    BN_clear(rr);
+  } else
     rr = r;
 
   bool ret = false;
-  int digits = params->R.top;
+  int digits = params->R.top - 1;
 
-  if(!BN_mod_digits(rr, t, digits)
-     || !BN_mul(rr, rr, &params->Ni)
-     || !BN_mod_digits(rr, rr, digits)
-     || !BN_mul(rr, rr, &params->N)
-     || !BN_add(rr, rr, t)
-     || !BN_rshift_digits(rr, rr, digits))
+  if (!BN_mod_digits(rr, t, digits)
+      || !BN_mul(rr, rr, &params->Ni)
+      || !BN_mod_digits(rr, rr, digits)
+      || !BN_mul(rr, rr, &params->N)
+      || !BN_add(rr, rr, t)
+      || !BN_rshift_digits(rr, rr, digits))
     goto end;
   if (BN_ucmp(rr, &params->N) >= 0) {
     if (!BN_sub(rr, rr, &params->N))
