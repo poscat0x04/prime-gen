@@ -116,3 +116,40 @@ end:
     BN_free_alloca(rr);
   return ret;
 }
+
+bool MONT_exp(MONT *r, const MONT *a, const BIGINT *e, const MONT_PARAMS *params) {
+  assert(!BN_is_negative(e));
+
+  MONT *rr;
+  bool ret = false;
+
+  if (r == a) {
+    BN_alloca(rr)
+    BN_clear(rr);
+  } else
+    rr = r;
+
+  BN_init(a_tmp)
+  BN_init(e_tmp)
+  if (BN_copy(a_tmp, a) == NULL
+      || BN_copy(e_tmp, e) == NULL
+      || BN_copy(rr, &params->One) == NULL)
+    goto end;
+
+  while (!BN_is_zero(e_tmp)) {
+    if (BN_is_odd(e_tmp))
+      if (!MONT_mul(rr, rr, a_tmp, params))
+        goto end;
+    if (!MONT_mul(a_tmp, a_tmp, a_tmp, params)
+        || !BN_rshift(e_tmp, e_tmp, 1))
+      goto end;
+  }
+
+  if (r == a)
+    BN_move(r, rr);
+  ret = true;
+end:
+  if (!ret && r == a)
+    BN_free_alloca(rr);
+  return ret;
+}
