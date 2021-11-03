@@ -18,9 +18,11 @@ int main(void) {
   BN_set_word(a, 99);
   MONT_PARAMS *params = init_mont(a);
   assert(params != NULL);
-  BN_init(tmp)
-  to_mont(tmp, b, params);
-  from_mont(tmp, tmp, params);
-  BN_println(b);
+  to_mont(b, b, params);
+  BN_set_word(a, 100);
+  to_mont(a, a, params);
+  MONT_mul(a, a, b, params);
+  from_mont(a, a, params);
+  BN_println(a);
   return 0;
 }

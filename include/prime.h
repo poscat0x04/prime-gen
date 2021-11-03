@@ -15,6 +15,7 @@ void free_mont(MONT_PARAMS *params);
 bool REDC(BIGINT *r, const BIGINT *t, const MONT_PARAMS *params);
 bool to_mont(MONT *r, const BIGINT *a, const MONT_PARAMS *params);
 #define from_mont(r, t, params) REDC(r, t, params)
+bool MONT_mul(MONT *r, const MONT *a, const MONT *b, const MONT_PARAMS *params);
 
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);

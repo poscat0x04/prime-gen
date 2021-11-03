@@ -90,3 +90,26 @@ end:
     BN_free_alloca(rr);
   return ret;
 }
+
+bool MONT_mul(MONT *r, const MONT *a, const MONT *b, const MONT_PARAMS *params) {
+  MONT *rr;
+  bool ret = false;
+
+  if (r == a) {
+    BN_alloca(rr)
+    BN_clear(rr);
+  } else
+    rr = r;
+
+  if (!BN_mul(rr, a, b)
+      || !REDC(rr, rr, params))
+    goto end;
+
+  if (r == a)
+    BN_move(r, rr);
+  ret = true;
+end:
+  if (!ret && r == a)
+    BN_free_alloca(rr);
+  return ret;
+}
