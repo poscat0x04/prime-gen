@@ -85,6 +85,9 @@ struct bigint_t {
 
 typedef struct bigint_t BIGINT;
 
+extern const BIGINT C_BN_one;
+extern const BIGINT C_BN_zero;
+
 u64 *bn_expand_internal(BIGINT *b, int word);
 BIGINT *bn_expand2(BIGINT *b, int word);
 BIGINT *bn_wexpand(BIGINT *a, int word);
