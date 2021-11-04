@@ -20,8 +20,10 @@ int main(void) {
   BN_mod_exp(b, b, y, a);
   BN_println(b);
   seed();
-  RNG_PARAMS *params = to_rng_params(y);
-  bn_gen(a, params);
-  BN_println(a);
+  BN_lshift_digits(y, y, 1);
+  RNG_PARAMS *params = to_rng_params(y, false);
+  BN_init(tmp)
+  bn_gen(tmp, params);
+  BN_println(tmp);
   return 0;
 }

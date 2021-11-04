@@ -46,27 +46,53 @@ u64 next(void) {
   return result;
 }
 
-RNG_PARAMS *to_rng_params(const BIGINT *a) {
+RNG_PARAMS *to_rng_params(const BIGINT *a, bool copy) {
   if (BN_cmp_word(a, 0) <= 0)
     return NULL;
   RNG_PARAMS *params = malloc(sizeof(RNG_PARAMS));
+  if (params == NULL)
+    return NULL;
 
-  params->digits = a->top;
-  params->highest_digit = a->d[a->top - 1];
-  params->hd_used_bits = BN_num_bits_word(params->highest_digit);
+  params->top = a->top;
+  if (copy) {
+    if ((params->d = malloc(params->top * sizeof(*params->d))) == NULL) {
+      free(params);
+      return NULL;
+    }
+    memcpy(params->d, a->d, params->top * sizeof(*params->d));
+  } else
+    params->d = a->d;
+  params->hd_used_bits = BN_num_bits_word(a->d[a->top - 1]);
   return params;
 }
 
 bool bn_gen(BIGINT *r, const RNG_PARAMS *params) {
-  if (bn_expand_nocpy(r, params->digits) == NULL)
+  if (bn_expand_nocpy(r, params->top) == NULL)
     return false;
-  for (int i = 0; i < params->digits - 1; i++) {
-    r->d[i] = next();
-  }
+
   u64 m;
-  while ((m = next() & ((1 << params->hd_used_bits) - 1)) > params->highest_digit);
-  r->d[params->digits - 1] = m;
-  r->top = params->digits;
+  int i;
+beginning:
+  while ((m = next() & ((1 << params->hd_used_bits) - 1)) > params->d[params->top - 1]);
+  r->d[params->top - 1] = m;
+  // m == highest digit
+  for (i = params->top - 2; i >= 0; i--) {
+    m = next();
+    r->d[i] = m;
+  }
+  for (i = params->top - 1; i >= 0; i--) {
+    if (r->d[i] < params->d[i]) {
+      goto out;
+    } else if (r->d[i] >= params->d[i]) {
+      goto beginning;
+    }
+  }
+out:
+  r->neg = false;
+  r->top = params->top;
+  while(r->top && r->d[r->top - 1] == 0) {
+    r->top--;
+  }
   return true;
 }
 

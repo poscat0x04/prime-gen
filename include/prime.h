@@ -11,8 +11,8 @@ struct mont_params_t {
 };
 
 struct rng_params_t {
-  int digits;
-  u64 highest_digit;
+  int top;
+  u64 *d;
   u64 hd_used_bits;
 };
 
@@ -32,7 +32,7 @@ bool BN_mod_exp_mont(BIGINT *r, const BIGINT *a, const BIGINT *e, const MONT_PAR
 
 void seed(void);
 u64 next(void);
-RNG_PARAMS *to_rng_params(const BIGINT *a);
+RNG_PARAMS *to_rng_params(const BIGINT *a, bool copy);
 bool bn_gen(BIGINT *r, const RNG_PARAMS *params);
 bool bn_gen_pred(BIGINT *r, const RNG_PARAMS *params, bool (*pred)(const BIGINT *));
 
