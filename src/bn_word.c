@@ -174,11 +174,6 @@ u64 BN_div_word(BIGINT *a, u64 w) {
 }
 
 #ifdef ASM
-/// Divides a 128 bit integer with a 64 bit integer, the remainder is not kept
-/// \param h The higher bit of the 128 bit integer (base 2^64)
-/// \param l The lower bit of the 128 bit integer (base 2^64)
-/// \param d The divisor
-/// \return The quotient
 u64 bn_div_words(u64 h, u64 l, u64 d) {
   u64 ret, waste;
   asm( "divq      %4"
@@ -189,6 +184,11 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
   return ret;
 }
 #else
+/// Divides a 128 bit integer with a 64 bit integer, the remainder is not kept
+/// \param h The higher bit of the 128 bit integer (base 2^64)
+/// \param l The lower bit of the 128 bit integer (base 2^64)
+/// \param d The divisor
+/// \return The quotient
 u64 bn_div_words(u64 h, u64 l, u64 d) {
   u64 dh, dl, q, ret = 0, th, tl, t;
   int i, count = 2;
@@ -258,6 +258,33 @@ u64 bn_div_words(u64 h, u64 l, u64 d) {
 /// \param b The other bigint input
 /// \param n The length of the two inputs
 /// \return The carry
+#ifdef ASM
+u64 bn_sub_words(u64 *rp, const u64 *ap, const u64 *bp,
+                      int n)
+{
+  u64 ret;
+  size_t i = 0;
+
+  if (n <= 0)
+    return 0;
+
+  asm volatile ("       subq    %0,%0           \n" /* clear borrow */
+                "       jmp     1f              \n"
+                ".p2align 4                     \n"
+                "1:     movq    (%4,%2,8),%0    \n"
+                "       sbbq    (%5,%2,8),%0    \n"
+                "       movq    %0,(%3,%2,8)    \n"
+                "       lea     1(%2),%2        \n"
+                "       dec     %1              \n"
+                "       jnz     1b              \n"
+                "       sbbq    %0,%0           \n"
+  :"=&r" (ret), "+c"(n), "+r"(i)
+  :"r"(rp), "r"(ap), "r"(bp)
+  :"cc", "memory");
+
+  return ret & 1;
+}
+#else
 u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   u64 t1, t2;
   int carry = 0;
@@ -278,6 +305,7 @@ u64 bn_sub_words(u64 *r, const u64 *a, const u64 *b, int n) {
   }
   return carry;
 }
+#endif
 
 /// Adds bigint array a and b and places the results in c
 /// \param r An array to hold the sum

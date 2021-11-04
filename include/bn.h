@@ -176,10 +176,12 @@ u64 bn_mul_words(u64 *rp, const u64 *ap, int num, u64 w);
 u64 bn_mul_add_words(u64 *rp, const u64 *ap, int num, u64 w);
 void bn_sqr_words(u64 *r, const u64 *a, int n);
 
+#ifdef ASM
 bool bn_div_fixed_top(BIGINT *dv,
                       BIGINT *rm,
                       const BIGINT *num,
                       const BIGINT *divisor);
+#endif
 bool BN_is_odd(const BIGINT *a);
 bool bn_lshift_fixed_top(BIGINT *r, const BIGINT *a, int n);
 bool bn_rshift_fixed_top(BIGINT *r, const BIGINT *a, int n);

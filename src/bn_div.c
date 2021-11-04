@@ -3,19 +3,30 @@
 #include <alloca.h>
 #include <string.h>
 
+#ifdef ASM
+#undef bn_div_words
+#define bn_div_words(n0, n1, d0)                  \
+        ({  asm volatile (                      \
+                "divq   %4"                     \
+                : "=a"(q), "=d"(rem)            \
+                : "a"(n1), "d"(n0), "r"(d0)     \
+                : "cc");                        \
+            q;                                  \
+        })
+
 static int bn_left_align(BIGINT *num) {
   u64 *d = num->d, n, m, rmask;
   int top = num->top;
-  int rshift = BN_num_bits_word(d[top-1]), lshift, i;
+  int rshift = BN_num_bits_word(d[top - 1]), lshift, i;
 
   lshift = BN_BITS2 - rshift;
   rshift %= BN_BITS2;
-  rmask = (u64)0 - rshift;
+  rmask = (u64) 0 - rshift;
   rmask |= rmask >> 8;
 
   for (i = 0, m = 0; i < top; i++) {
     n = d[i];
-    d[i] = ((n << lshift) | m) ;
+    d[i] = ((n << lshift) | m);
     m = (n >> rshift) & rmask;
   }
 
@@ -55,7 +66,7 @@ bool bn_div_fixed_top(BIGINT *dv,
                       const BIGINT *num,
                       const BIGINT *divisor) {
   int norm_shift, i, j, loop;
-  BIGINT *tmp, *snum, *sdiv, *res;
+  BIGINT *res;
   u64 *resp, *wnum, *wnumtop;
   u64 d0, d1;
   int num_n, div_n, num_neg;
@@ -66,12 +77,13 @@ bool bn_div_fixed_top(BIGINT *dv,
   if (dv == NULL) {
     temp_res = true;
     BN_alloca(res)
+    BN_zero(res);
   } else {
     res = dv;
   }
-  BN_alloca(tmp)
-  BN_alloca(snum)
-  BN_alloca(sdiv)
+  BN_init(tmp)
+  BN_init(snum)
+  BN_init(sdiv)
 
   if (!BN_copy(sdiv, divisor))
     goto err;
@@ -140,9 +152,7 @@ bool bn_div_fixed_top(BIGINT *dv,
       // divides n0:n1 by d0
       q = bn_div_words(n0, n1, d0);
 
-      u128 ret = (u128) (d1) * (q);
-      t2h = ret >> 64;
-      t2l = ret;
+      BN_UMULT_LOHI(t2l, t2h, d1, q)
 
       while (true) {
         if ((t2h < rem) || ((t2h == rem) && (t2l <= n2)))
@@ -197,3 +207,136 @@ err:
   BN_free_allocas(3, tmp, snum, sdiv);
   return false;
 }
+
+#else
+int BN_lshift1(BIGINT *r, const BIGINT *a)
+{
+    register u64 *ap, *rp, t, c;
+    int i;
+
+    if (r != a) {
+        r->neg = a->neg;
+        if (bn_wexpand(r, a->top + 1) == NULL)
+            return 0;
+        r->top = a->top;
+    } else {
+        if (bn_wexpand(r, a->top + 1) == NULL)
+            return 0;
+    }
+    ap = a->d;
+    rp = r->d;
+    c = 0;
+    for (i = 0; i < a->top; i++) {
+        t = *(ap++);
+        *(rp++) = ((t << 1) | c) & UINT64_MAX;
+        c = t >> (BN_BITS2 - 1);
+    }
+    *rp = c;
+    r->top += c;
+    return 1;
+}
+
+int BN_rshift1(BIGINT *r, const BIGINT *a) {
+    u64 *ap, *rp, t, c;
+    int i;
+
+    if (BN_is_zero(a)) {
+        BN_zero(r);
+        return 1;
+    }
+    i = a->top;
+    ap = a->d;
+    if (a != r) {
+        if (bn_wexpand(r, i) == NULL)
+            return 0;
+        r->neg = a->neg;
+    }
+    rp = r->d;
+    r->top = i;
+    t = ap[--i];
+    rp[i] = t >> 1;
+    c = t << (BN_BITS2 - 1);
+    r->top -= (t == 1);
+    while (i > 0) {
+        t = ap[--i];
+        rp[i] = ((t >> 1) & UINT64_MAX) | c;
+        c = t << (BN_BITS2 - 1);
+    }
+    if (!r->top)
+        r->neg = 0; /* don't allow negative zero */
+    return 1;
+}
+
+bool BN_div(BIGINT *dv, BIGINT *rem, const BIGINT *m, const BIGINT *d) {
+  int i, nm, nd;
+  int ret = 0;
+  BIGINT *D;
+
+  if (BN_is_zero(d)) {
+    return 0;
+  }
+
+  if (BN_ucmp(m, d) < 0) {
+    if (rem != NULL) {
+      if (BN_copy(rem, m) == NULL)
+        return 0;
+    }
+    if (dv != NULL)
+      BN_zero(dv);
+    return 1;
+  }
+
+  BN_alloca(D);
+  bool dv_alloca = false, rem_alloca = false;
+  if (dv == NULL) {
+    dv_alloca = true;
+    BN_alloca(dv);
+  }
+  if (rem == NULL) {
+    rem_alloca = true;
+    BN_alloca(rem);
+  }
+  if (D == NULL || dv == NULL || rem == NULL)
+    goto end;
+
+  nd = BN_num_bits(d);
+  nm = BN_num_bits(m);
+  if (BN_copy(D, d) == NULL)
+    goto end;
+  if (BN_copy(rem, m) == NULL)
+    goto end;
+
+  /*
+   * The next 2 are needed so we can do a dv->d[0]|=1 later since
+   * BN_lshift1 will only work once there is a value :-)
+   */
+  BN_zero(dv);
+  if (bn_wexpand(dv, 1) == NULL)
+    goto end;
+  dv->top = 1;
+
+  if (!BN_lshift(D, D, nm - nd))
+    goto end;
+  for (i = nm - nd; i >= 0; i--) {
+    if (!BN_lshift1(dv, dv))
+      goto end;
+    if (BN_ucmp(rem, D) >= 0) {
+      dv->d[0] |= 1;
+      if (!BN_usub(rem, rem, D))
+        goto end;
+    }
+    if (!BN_rshift1(D, D))
+      goto end;
+  }
+  rem->neg = BN_is_zero(rem) ? 0 : m->neg;
+  dv->neg = m->neg ^ d->neg;
+  ret = 1;
+end:
+  BN_free_alloca(D);
+  if (dv_alloca)
+    BN_free_alloca(dv);
+  if (rem_alloca)
+    BN_free_alloca(rem);
+  return ret;
+}
+#endif
