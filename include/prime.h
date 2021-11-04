@@ -36,5 +36,9 @@ RNG_PARAMS *to_rng_params(const BIGINT *a, bool copy);
 bool bn_gen(BIGINT *r, const RNG_PARAMS *params);
 bool bn_gen_pred(BIGINT *r, const RNG_PARAMS *params, bool (*pred)(const BIGINT *));
 
+bool BN_is_prime(const BIGINT *n, int iterations, bool *is_prime);
+
+bool bn_bigger_than_one(const BIGINT *a);
+
 bool extgcd(BIGINT *gcd, BIGINT *coe_x, BIGINT *coe_y,
             const BIGINT *a, const BIGINT *b);
