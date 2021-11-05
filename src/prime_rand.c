@@ -66,6 +66,11 @@ RNG_PARAMS *to_rng_params(const BIGINT *a, bool copy) {
   return params;
 }
 
+void free_rng_params(RNG_PARAMS *params) {
+  free(params->d);
+  free(params);
+}
+
 bool bn_gen(BIGINT *r, const RNG_PARAMS *params) {
   assert(params->hd_used_bits <= 64);
   if (bn_expand_nocpy(r, params->top) == NULL)

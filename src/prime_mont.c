@@ -12,8 +12,10 @@ MONT_PARAMS *init_mont(const BIGINT *n) {
   MONT *One_mont = &params->One;
   BN_init(gcd)
   BN_clear(R);
+  BN_clear(RR);
   BN_clear(N);
   BN_clear(Ni);
+  BN_clear(One_mont);
   if (!BN_set_word(R, 1)
       || !BN_lshift_digits(R, R, n->top)
       || BN_copy(N, n) == NULL)

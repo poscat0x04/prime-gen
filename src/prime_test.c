@@ -29,7 +29,7 @@ bool BN_is_prime(const BIGINT *n, int iterations, bool *is_prime) {
       || BN_copy(n_minus_one, n) == NULL
       || !BN_sub_word(n_minus_one, 1)
       || !BN_sub_word(d, 2)
-      || ((rng_params = to_rng_params(d, false)) == NULL)
+      || ((rng_params = to_rng_params(d, true)) == NULL)
       || ((mont_params = init_mont(n)) == NULL)
       || !BN_add_word(d, 1))
     goto err;
@@ -52,6 +52,7 @@ bool BN_is_prime(const BIGINT *n, int iterations, bool *is_prime) {
         goto end;
     }
     *is_prime = false;
+    free_rng_params(rng_params);
     return true;
 end:;
   }
